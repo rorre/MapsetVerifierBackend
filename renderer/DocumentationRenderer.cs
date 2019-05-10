@@ -57,7 +57,7 @@ namespace MapsetVerifierApp.renderer
 
         private static string RenderModeCategory(string title, IEnumerable<Check> aChecks)
         {
-            if (aChecks.Count() == 0)
+            if (!aChecks.Any())
                 return "";
 
             return

@@ -165,7 +165,7 @@ namespace MapsetVerifierApp.renderer
                         DivAttr("card-detail",
                             metadata != null ? DifficultiesDataAttr(metadata.Difficulties) : "",
                             Div("card-detail-icon " + GetIcon(issues) + "-icon"),
-                            (issues.Count() > 0 ?
+                            (issues.Any() ?
                             Div("",
                                 Div("card-detail-text",
                                     message
@@ -182,7 +182,7 @@ namespace MapsetVerifierApp.renderer
 
         private static string RenderBeatmapDetails(IEnumerable<Issue> aCheckIssues)
         {
-            if (aCheckIssues.Count() == 0)
+            if (!aCheckIssues.Any())
                 return "";
 
             return
