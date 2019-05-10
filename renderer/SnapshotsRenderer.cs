@@ -160,7 +160,7 @@ namespace MapsetVerifierApp.renderer
                                     ),
                                     Div("card-details-container",
                                         Div("card-details",
-                                            RenderSnapshotDiffs(aSectionDiffs, aSnapshots, aSectionDiffs.Key)
+                                            RenderSnapshotDiffs(aSectionDiffs, aSnapshots)
                                         )
                                     )
                                 );
@@ -170,8 +170,7 @@ namespace MapsetVerifierApp.renderer
 
         private static string RenderSnapshotDiffs(
             IEnumerable<DiffInstance> aSectionDiffs,
-            IEnumerable<Snapshotter.Snapshot> aSnapshots,
-            string aSection)
+            IEnumerable<Snapshotter.Snapshot> aSnapshots)
         {
             return
                 String.Concat(
@@ -184,7 +183,7 @@ namespace MapsetVerifierApp.renderer
                         DivAttr("card-detail",
                             DataAttr("condition", "difficulty=" + condition),
                             Div("card-detail-icon " + GetIcon(aDiff) + "-icon"),
-                            (aDiff.details.Count() > 0 ?
+                            (aDiff.details.Any() ?
                             Div("",
                                 Div("card-detail-text",
                                     message
@@ -233,7 +232,7 @@ namespace MapsetVerifierApp.renderer
                     aSnapshots.ElementAt(myNextIndex).creationTime;
 
             List<int> indexes = new List<int>();
-            for (int i = 0; i < snapshotDates.Count(); ++i)
+            for (int i = 0; i < snapshotDates.Count; ++i)
                 if (snapshotDates.ElementAt(i) < myNextDate &&
                     snapshotDates.ElementAt(i) >= aDiff.snapshotCreationDate)
                     indexes.Add(i);
