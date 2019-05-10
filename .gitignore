@@ -5,3 +5,4 @@
 *.sln
 /snapshots
 /checks
+GlobalSuppressions.cs
