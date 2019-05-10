@@ -7,6 +7,8 @@ namespace MapsetVerifierApp.server
 {
     public class Host
     {
+        public const string hubUrl = "/mapsetverifier/signalr";
+
         public static void Initialize()
         {
             IWebHost myHost = new WebHostBuilder()
@@ -47,7 +49,7 @@ namespace MapsetVerifierApp.server
 
                 app.UseSignalR(routes =>
                 {
-                    routes.MapHub<SignalHub>("/mapsetverifier/signalr");
+                    routes.MapHub<SignalHub>(hubUrl);
                 });
 
                 app.UseMvc();
