@@ -88,7 +88,7 @@ namespace MapsetVerifierApp.renderer
         protected static string GetIcon(IEnumerable<Issue> anIssues)
         {
             return
-                anIssues.Count() > 0 ?
+                anIssues.Any() ?
                     GetIcon(anIssues.Max(anIssue => anIssue.level)) :
                     GetIcon(Issue.Level.Check);
         }
