@@ -18,7 +18,7 @@ namespace MapsetVerifierApp.renderer
 
         public static string Render(BeatmapSet aBeatmapSet)
         {
-            snapshotDates = GetSnapshotDates(aBeatmapSet);
+            InitSnapshotDates(aBeatmapSet);
             
             return String.Concat(
                     RenderBeatmapInfo(aBeatmapSet),
@@ -241,9 +241,9 @@ namespace MapsetVerifierApp.renderer
             return String.Join(",", indexes);
         }
 
-        private static List<DateTime> GetSnapshotDates(BeatmapSet aBeatmapSet)
+        private static void InitSnapshotDates(BeatmapSet aBeatmapSet)
         {
-            List<DateTime> snapshotDates =
+            snapshotDates =
                aBeatmapSet.beatmaps.SelectMany(aBeatmap =>
                    Snapshotter.GetSnapshots(aBeatmap)
                        .Select(aSnapshot => aSnapshot.creationTime))
@@ -253,7 +253,7 @@ namespace MapsetVerifierApp.renderer
                 aBeatmapSet.beatmaps.First().metadataSettings.beatmapSetId.ToString(), "files")
                     .Select(aSnapshot => aSnapshot.creationTime));
 
-            return snapshotDates.Distinct().ToList();
+            snapshotDates = snapshotDates.Distinct().ToList();
         }
 
         private static string GetIcon(DiffInstance aDiff)
