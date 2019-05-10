@@ -12,8 +12,8 @@ namespace MapsetVerifierApp.server
 {
     public class SignalHub : Hub
     {
-        private static BeatmapSet loadedBeatmapSet = null;
-        private static string loadedBeatmapSetPath = null;
+        private BeatmapSet loadedBeatmapSet = null;
+        private string loadedBeatmapSetPath = null;
 
         /// <summary> Returns whether the message was successfully sent or failed. </summary>
         public async Task<bool> SendMessage(string aKey, string aValue)
@@ -83,7 +83,7 @@ namespace MapsetVerifierApp.server
             }
         }
 
-        private static void LoadBeatmapSet(string aSongFolderPath)
+        private void LoadBeatmapSet(string aSongFolderPath)
         {
             if (loadedBeatmapSetPath != aSongFolderPath)
             {
