@@ -55,7 +55,6 @@ namespace MapsetVerifierApp.renderer
 
         private static string RenderBeatmapChecks(List<Issue> anIssues, BeatmapSet aBeatmapSet)
         {
-            Beatmap refBeatmap = aBeatmapSet.beatmaps[0];
             IEnumerable<Issue> generalIssues = anIssues.Where(anIssue => anIssue.CheckOrigin is GeneralCheck);
 
             return
