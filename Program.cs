@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace MapsetVerifierApp
 {
-    class Program
+    internal static class Program
     {
         static void Main(string[] args)
         {
