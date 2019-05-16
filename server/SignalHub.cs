@@ -94,8 +94,8 @@ namespace MapsetVerifierApp.server
             }
             catch (Exception exception)
             {
-                ;
-                //await SendMessage("UpdateErrors", html); TODO
+                string html = ExceptionRenderer.Render(exception);
+                await SendMessage("UpdateException", html);
             }
         }
 
