@@ -1,4 +1,5 @@
 ﻿using MapsetParser.objects;
+using MapsetParser.statics;
 using MapsetSnapshotter;
 using MapsetVerifier;
 using MapsetVerifier.objects;
@@ -12,9 +13,6 @@ namespace MapsetVerifierApp.server
 {
     public class SignalHub : Hub
     {
-        private BeatmapSet loadedBeatmapSet = null;
-        private string loadedBeatmapSetPath = null;
-
         /// <summary> Returns whether the message was successfully sent or failed. </summary>
         public async Task<bool> SendMessage(string aKey, string aValue)
         {
@@ -29,7 +27,21 @@ namespace MapsetVerifierApp.server
                 return false;
             }
         }
-        
+
+        private async Task LoadStart(string aLoadMessage)
+        {
+            Console.WriteLine("ADD " + aLoadMessage);
+            await SendMessage("AddLoad", "Checks:" + Renderer.Encode(aLoadMessage));
+            await SendMessage("AddLoad", "Snapshots:" + Renderer.Encode(aLoadMessage));
+        }
+
+        private async Task LoadComplete(string aLoadMessage)
+        {
+            Console.WriteLine("REMOVE " + aLoadMessage);
+            await SendMessage("RemoveLoad", "Checks:" + Renderer.Encode(aLoadMessage));
+            await SendMessage("RemoveLoad", "Snapshots:" + Renderer.Encode(aLoadMessage));
+        }
+
         public async Task ClientMessage(string aKey, string aValue)
         {
             Console.WriteLine("Received message with key \"" + aKey + "\", and value \"" + aValue + "\".");
@@ -54,21 +66,25 @@ namespace MapsetVerifierApp.server
                     case "RequestChecks":
                         {
                             LoadBeatmapSet(aValue);
-                            List<Issue> issues = Checker.GetBeatmapSetIssues(loadedBeatmapSet);
-                            string html = ChecksRenderer.Render(issues, loadedBeatmapSet);
+
+                            Checker.OnLoadStart = LoadStart;
+                            Checker.OnLoadComplete = LoadComplete;
+
+                            List<Issue> issues = Checker.GetBeatmapSetIssues(State.LoadedBeatmapSet);
+                            string html = ChecksRenderer.Render(issues, State.LoadedBeatmapSet);
                             await SendMessage("UpdateChecks", html);
 
                             // Reset the lazy loading so in case the map changes and is clicked on
                             // again we can provide proper snapshots/checks for that.
                             // Relies on that snapshots are completed before checks, which is currently always the case.
-                            loadedBeatmapSetPath = "";
+                            State.LoadedBeatmapSetPath = "";
                         }
                         break;
                     case "RequestSnapshots":
                         {
                             LoadBeatmapSet(aValue);
-                            Snapshotter.SnapshotBeatmapSet(loadedBeatmapSet);
-                            string html = SnapshotsRenderer.Render(loadedBeatmapSet);
+                            Snapshotter.SnapshotBeatmapSet(State.LoadedBeatmapSet);
+                            string html = SnapshotsRenderer.Render(State.LoadedBeatmapSet);
                             await SendMessage("UpdateSnapshots", html);
                         }
                         break;
@@ -85,10 +101,13 @@ namespace MapsetVerifierApp.server
 
         private void LoadBeatmapSet(string aSongFolderPath)
         {
-            if (loadedBeatmapSetPath != aSongFolderPath)
+            if (State.LoadedBeatmapSetPath != aSongFolderPath)
             {
-                loadedBeatmapSet = new BeatmapSet(aSongFolderPath);
-                loadedBeatmapSetPath = aSongFolderPath;
+                EventStatic.OnLoadStart = LoadStart;
+                EventStatic.OnLoadComplete = LoadComplete;
+
+                State.LoadedBeatmapSet = new BeatmapSet(aSongFolderPath);
+                State.LoadedBeatmapSetPath = aSongFolderPath;
             }
         }
     }

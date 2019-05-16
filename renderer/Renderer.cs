@@ -77,7 +77,7 @@ namespace MapsetVerifierApp.renderer
         }
 
         /// <summary> Returns the same string but HTML encoded, meaning greater and less than signs no longer form actual tags. </summary>
-        protected static string Encode(string aString)
+        public static string Encode(string aString)
         {
             return WebUtility.HtmlEncode(aString);
         }
