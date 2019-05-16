@@ -194,11 +194,11 @@ namespace MapsetVerifierApp.renderer
                                 message
                             ))
                         ) +
-                        RenderDiffDetails(aDiff.details);
+                        RenderDiffDetails(aDiff.details, condition);
                 }));
         }
 
-        private static string RenderDiffDetails(List<string> aDetails)
+        private static string RenderDiffDetails(List<string> aDetails, string aCondition)
         {
             string detailIcon = "gear-blue";
             return
@@ -210,7 +210,8 @@ namespace MapsetVerifierApp.renderer
                             return "";
 
                         return
-                            Div("card-detail",
+                            DivAttr("card-detail",
+                                DataAttr("condition", "difficulty=" + aCondition),
                                 Div("card-detail-icon " + detailIcon + "-icon"),
                                 Div("",
                                     timestampedMessage
