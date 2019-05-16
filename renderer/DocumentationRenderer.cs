@@ -87,7 +87,7 @@ namespace MapsetVerifierApp.renderer
                     })),
 
                     Div("doc-box-category",
-                        Encode(aCheck.GetMetadata().Category)
+                        Encode(aCheck.GetMetadata().GetMode() + " > " + aCheck.GetMetadata().Category)
                     ) +
                     Div("doc-box-author",
                         Encode(aCheck.GetMetadata().Author)
