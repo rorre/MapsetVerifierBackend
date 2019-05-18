@@ -1,5 +1,6 @@
 ﻿using MapsetParser.objects;
 using MapsetVerifier.objects;
+using MapsetVerifier.objects.metadata;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -54,8 +55,31 @@ namespace MapsetVerifierApp.renderer
             return DataAttr("tooltip", aContent);
         }
 
+        protected static string DifficultiesDataAttr(Issue anIssue)
+        {
+            BeatmapCheckMetadata metadata = anIssue.CheckOrigin.GetMetadata() as BeatmapCheckMetadata;
+
+            List<Beatmap.Difficulty> difficulties = new List<Beatmap.Difficulty>();
+            foreach (Beatmap.Difficulty difficulty in Enum.GetValues(typeof(Beatmap.Difficulty)))
+                if ((metadata?.Difficulties.Contains(difficulty) ?? true) && (
+                        !anIssue.InterpretationPairs.Any(aPair => aPair.Key == "difficulty") ||
+                        anIssue.InterpretationPairs.Any(aPair => aPair.Key == "difficulty" && aPair.Value == (int)difficulty)))
+                    difficulties.Add(difficulty);
+
+            if (difficulties.Count == Enum.GetValues(typeof(Beatmap.Difficulty)).Length)
+                return "";
+
+            return
+                DataAttr("condition",
+                    "difficulty=" + String.Join(",", difficulties.Select(aDifficulty => (int)aDifficulty))
+                );
+        }
+
         protected static string DifficultiesDataAttr(Beatmap.Difficulty[] aDifficulties)
         {
+            if (aDifficulties.Count() == Enum.GetValues(typeof(Beatmap.Difficulty)).Length)
+                return "";
+
             return
                 DataAttr("condition",
                     "difficulty=" + String.Join(",", aDifficulties.Select(aDifficulty => (int)aDifficulty))

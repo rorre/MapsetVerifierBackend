@@ -193,12 +193,10 @@ namespace MapsetVerifierApp.renderer
                         if (timestampedMessage.Length == 0)
                             return "";
 
-                        BeatmapCheckMetadata metadata = anIssue.CheckOrigin.GetMetadata() as BeatmapCheckMetadata;
-
                         return
                             DivAttr("card-detail",
                                 (anIssue.Template != null ? DataAttr("template", anIssue.Template) : "") +
-                                (metadata != null ? DifficultiesDataAttr(metadata.Difficulties) : ""),
+                                DifficultiesDataAttr(anIssue),
                                 Div("card-detail-icon " + icon + "-icon"),
                                 Div("",
                                     timestampedMessage
