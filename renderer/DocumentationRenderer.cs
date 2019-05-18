@@ -69,7 +69,8 @@ namespace MapsetVerifierApp.renderer
                 );
         }
 
-        private static string RenderCheckBox(Check aCheck)
+        /// <summary> Returns the html of a check as shown in the documentation tab. </summary>
+        public static string RenderCheckBox(Check aCheck)
         {
             return
                 RenderDocBox(
