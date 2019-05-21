@@ -144,9 +144,9 @@ namespace MapsetVerifierApp.renderer
                 Div("card-difficulty-checks",
                     aBeatmapDiffs
                         .Where(aDiff => aFiles ?
-                            aDiff.section == "Files" :
-                            aDiff.section != "Files")
-                        .GroupBy(aCheck => aCheck.section)
+                            aDiff.Section == "Files" :
+                            aDiff.Section != "Files")
+                        .GroupBy(aDiff => aDiff.Section)
                         .Select(aSectionDiffs =>
                         {
                             return
