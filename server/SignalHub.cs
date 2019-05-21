@@ -65,6 +65,7 @@ namespace MapsetVerifierApp.server
                         {
                             LoadBeatmapSet(aValue);
 
+                            await SendMessage("ClearLoad", "");
                             Checker.OnLoadStart = LoadStart;
                             Checker.OnLoadComplete = LoadComplete;
 
