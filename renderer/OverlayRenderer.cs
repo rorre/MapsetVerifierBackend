@@ -21,8 +21,7 @@ namespace MapsetVerifierApp.renderer
 
             return String.Concat(
                 RenderOverlayTop(check.GetMetadata()),
-                RenderOverlayTemplates(check),
-                RenderOverlayDocumentation(check.GetMetadata()));
+                RenderOverlayContent(check));
         }
 
         public static string RenderOverlayTop(CheckMetadata aMetadata)
@@ -44,31 +43,41 @@ namespace MapsetVerifierApp.renderer
                 );
         }
 
-        public static string RenderOverlayTemplates(Check aCheck)
+        public static string RenderOverlayContent(Check aCheck)
         {
             return
                 Div("paste-separator") +
                 Div("\" style=\"clear:both;") +
                 Div("\" id=\"overlay-content",
-                    (aCheck.GetTemplates().Count > 0 ?
                     String.Concat(
-                    aCheck.GetTemplates().Select(aPair => aPair.Value).Select(aTemplate =>
-                    {
-                        return
-                            Div("check",
-                                Div("card-detail-icon " + GetIcon(aTemplate.Level) + "-icon"),
-                                Div("message",
-                                    aTemplate.Format(
-                                        aTemplate.GetDefaultArguments()
-                                            .Select(anArg => "<span>" + anArg + "</span>").ToArray()),
-                                    Div("cause",
-                                        ApplyMarkdown(aTemplate.GetCause())
-                                    )
-                                )
-                            );
-                    })) :
-                    "No issue templates available.")
+                        RenderOverlayTemplates(aCheck),
+                        RenderOverlayDocumentation(aCheck.GetMetadata())
+                    )
                 );
+        }
+
+        public static string RenderOverlayTemplates(Check aCheck)
+        {
+            return
+                (aCheck.GetTemplates().Count > 0 ?
+                    String.Concat(
+                        aCheck.GetTemplates().Select(aPair => aPair.Value).Select(aTemplate =>
+                        {
+                            return
+                                Div("check",
+                                    Div("card-detail-icon " + GetIcon(aTemplate.Level) + "-icon"),
+                                    Div("message",
+                                        aTemplate.Format(
+                                            aTemplate.GetDefaultArguments()
+                                                .Select(anArg => "<span>" + anArg + "</span>").ToArray()),
+                                        Div("cause",
+                                            ApplyMarkdown(aTemplate.GetCause())
+                                        )
+                                    )
+                                );
+                        })
+                    ) :
+                    "No issue templates available.");
         }
 
         public static string RenderOverlayDocumentation(CheckMetadata aMetadata)
@@ -77,11 +86,13 @@ namespace MapsetVerifierApp.renderer
                 String.Concat(
                 aMetadata.Documentation.Select(aSection =>
                 {
+                    string value = aSection.Value;
                     return
+                        ExtractFloatElements(ref value) +
                         Div("title",
-                            aSection.Key
+                            Encode(aSection.Key)
                         ) +
-                        ApplyMarkdown(aSection.Value);
+                        ApplyMarkdown(value);
                 }));
         }
     }

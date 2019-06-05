@@ -141,17 +141,40 @@ namespace MapsetVerifierApp.renderer
         /// <summary> Returns the given string with note or image tags replaced by actual html tags. </summary>
         protected static string ApplyMarkdown(string aValue)
         {
-            Regex myRegex = new Regex(@"<image>([A-Za-z0-9\/]+\.jpg)(.*?)<\/image>");
+            Regex regex = new Regex(@"<image(-(.+))?>[\ (\r\n|\r|\n)]+([A-Za-z0-9\/]+\.jpg)[\ (\r\n|\r|\n)]+(.*?)[\ (\r\n|\r|\n)]+<\/image>", RegexOptions.Singleline);
 
-            string myResult = aValue.Replace("<note>", "<div class=\"note\"><div class=\"note-text\">").Replace("</note>", "</div></div>");
+            string result = aValue.Replace("<note>", "<div class=\"note\"><div class=\"note-text\">").Replace("</note>", "</div></div>");
+            result = ExtractFloatElements(ref result) + result;
 
-            foreach (Match myMatch in myRegex.Matches(myResult))
+            foreach (Match match in regex.Matches(result))
             {
-                string myText = myMatch.Groups[2].Value;
-                myResult = myRegex.Replace(myResult, "<div class=\"image\" data-text=\"" + Encode(myText) + "\"><img src=\"$1\"></img></div>", 1);
+                string alignment = match.Groups[2]?.Value != "" ? match.Groups[2]?.Value : "center";
+                string src       = match.Groups[3].Value;
+                string text      = match.Groups[4].Value;
+                
+                result = regex.Replace(result,
+                    "<div class=\"image image-" + alignment + "\" data-text=\"" + Encode(text) + "\"><img src=\"" + src + "\"></img></div>", 1);
             }
 
-            return myResult;
+            return result;
+        }
+
+        /// <summary> Removes any floating elements (e.g. right-aligned images) from the input and returns them. </summary>
+        protected static string ExtractFloatElements(ref string aValue)
+        {
+            Regex regex = new Regex(@"<image-right>[\ (\r\n|\r|\n)]+([A-Za-z0-9\/]+\.jpg)[\ (\r\n|\r|\n)]+(.*?)[\ (\r\n|\r|\n)]+<\/image>", RegexOptions.Singleline);
+
+            StringBuilder result = new StringBuilder();
+            foreach (Match match in regex.Matches(aValue))
+            {
+                string src  = match.Groups[1].Value;
+                string text = match.Groups[2].Value;
+                
+                result.Append("<div class=\"image image-right\" data-text=\"" + Encode(text) + "\"><img src=\"" + src + "\"></img></div>");
+                aValue = regex.Replace(aValue, "", 1);
+            }
+
+            return result.ToString();
         }
     }
 }
