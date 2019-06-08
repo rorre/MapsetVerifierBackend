@@ -16,6 +16,7 @@ namespace MapsetVerifierApp.server
         /// <summary> Returns whether the message was successfully sent or failed. </summary>
         public async Task<bool> SendMessage(string aKey, string aValue)
         {
+            Console.WriteLine("Sending message with key \"" + aKey + "\".");
             try
             {
                 await Clients.All.SendAsync("ServerMessage", aKey, aValue);
