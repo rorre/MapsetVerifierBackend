@@ -13,6 +13,8 @@ namespace MapsetVerifierApp.server
 {
     public class SignalHub : Hub
     {
+        public const string relativeCheckPath = "../../checks";
+
         /// <summary> Returns whether the message was successfully sent or failed. </summary>
         public async Task<bool> SendMessage(string aKey, string aValue)
         {
@@ -50,14 +52,14 @@ namespace MapsetVerifierApp.server
                 {
                     case "RequestDocumentation":
                         {
-                            Checker.LoadCheckDLLs();
+                            Checker.LoadCheckDLLs(relativeCheckPath);
                             string html = DocumentationRenderer.Render();
                             await SendMessage("UpdateDocumentation", html);
                         }
                         break;
                     case "RequestOverlay":
                         {
-                            Checker.LoadCheckDLLs();
+                            Checker.LoadCheckDLLs(relativeCheckPath);
                             string html = OverlayRenderer.Render(aValue);
                             await SendMessage("UpdateOverlay", html);
                         }
