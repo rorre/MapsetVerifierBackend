@@ -7,13 +7,14 @@ using MapsetVerifierApp.renderer;
 using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace MapsetVerifierApp.server
 {
     public class SignalHub : Hub
     {
-        public const string relativeCheckPath = "../../checks";
+        public const string relativeCheckPath = "./resources/app/checks";
 
         /// <summary> Returns whether the message was successfully sent or failed. </summary>
         public async Task<bool> SendMessage(string aKey, string aValue)
@@ -85,6 +86,7 @@ namespace MapsetVerifierApp.server
                     case "RequestSnapshots":
                         {
                             LoadBeatmapSet(aValue);
+                            Snapshotter.RelativeDirectory = Path.Combine("resources", "app");
                             Snapshotter.SnapshotBeatmapSet(State.LoadedBeatmapSet);
                             string html = SnapshotsRenderer.Render(State.LoadedBeatmapSet);
                             await SendMessage("UpdateSnapshots", html);
