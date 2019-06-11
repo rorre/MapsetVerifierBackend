@@ -53,14 +53,16 @@ namespace MapsetVerifierApp.server
                 {
                     case "RequestDocumentation":
                         {
-                            Checker.LoadCheckDLLs(relativeCheckPath);
+                            Checker.RelativeDLLDirectory = relativeCheckPath;
+                            Checker.LoadCheckDLLs();
                             string html = DocumentationRenderer.Render();
                             await SendMessage("UpdateDocumentation", html);
                         }
                         break;
                     case "RequestOverlay":
                         {
-                            Checker.LoadCheckDLLs(relativeCheckPath);
+                            Checker.RelativeDLLDirectory = relativeCheckPath;
+                            Checker.LoadCheckDLLs();
                             string html = OverlayRenderer.Render(aValue);
                             await SendMessage("UpdateOverlay", html);
                         }
@@ -72,6 +74,8 @@ namespace MapsetVerifierApp.server
                             await SendMessage("ClearLoad", "");
                             Checker.OnLoadStart = LoadStart;
                             Checker.OnLoadComplete = LoadComplete;
+
+                            Checker.RelativeDLLDirectory = relativeCheckPath;
 
                             List<Issue> issues = Checker.GetBeatmapSetIssues(State.LoadedBeatmapSet);
                             string html = ChecksRenderer.Render(issues, State.LoadedBeatmapSet);
