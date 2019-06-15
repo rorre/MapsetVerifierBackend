@@ -47,63 +47,80 @@ namespace MapsetVerifierApp.server
         public async Task ClientMessage(string aKey, string aValue)
         {
             Console.WriteLine("Received message with key \"" + aKey + "\", and value \"" + aValue + "\".");
-            try
+
+            switch (aKey)
             {
-                switch (aKey)
-                {
-                    case "RequestDocumentation":
-                        {
-                            Checker.RelativeDLLDirectory = relativeCheckPath;
-                            Checker.LoadCheckDLLs();
-                            string html = DocumentationRenderer.Render();
-                            await SendMessage("UpdateDocumentation", html);
-                        }
-                        break;
-                    case "RequestOverlay":
-                        {
-                            Checker.RelativeDLLDirectory = relativeCheckPath;
-                            Checker.LoadCheckDLLs();
-                            string html = OverlayRenderer.Render(aValue);
-                            await SendMessage("UpdateOverlay", html);
-                        }
-                        break;
-                    case "RequestChecks":
-                        {
-                            LoadBeatmapSet(aValue);
+                case "RequestDocumentation":
+                    try
+                    {
+                        Checker.RelativeDLLDirectory = relativeCheckPath;
+                        Checker.LoadCheckDLLs();
+                        string html = DocumentationRenderer.Render();
+                        await SendMessage("UpdateDocumentation", html);
+                    }
+                    catch (Exception exception)
+                    {
+                        string html = ExceptionRenderer.Render(exception);
+                        await SendMessage("UpdateException", "Documentation:" + html);
+                    }
+                    break;
+                case "RequestOverlay":
+                    try
+                    {
+                        Checker.RelativeDLLDirectory = relativeCheckPath;
+                        Checker.LoadCheckDLLs();
+                        string html = OverlayRenderer.Render(aValue);
+                        await SendMessage("UpdateOverlay", html);
+                    }
+                    catch (Exception exception)
+                    {
+                        string html = ExceptionRenderer.Render(exception);
+                        await SendMessage("UpdateException", "Overlay:" + html);
+                    }
+                    break;
+                case "RequestChecks":
+                    try
+                    {
+                        LoadBeatmapSet(aValue);
 
-                            await SendMessage("ClearLoad", "");
-                            Checker.OnLoadStart = LoadStart;
-                            Checker.OnLoadComplete = LoadComplete;
+                        await SendMessage("ClearLoad", "");
+                        Checker.OnLoadStart = LoadStart;
+                        Checker.OnLoadComplete = LoadComplete;
 
-                            Checker.RelativeDLLDirectory = relativeCheckPath;
+                        Checker.RelativeDLLDirectory = relativeCheckPath;
 
-                            List<Issue> issues = Checker.GetBeatmapSetIssues(State.LoadedBeatmapSet);
-                            string html = ChecksRenderer.Render(issues, State.LoadedBeatmapSet);
-                            await SendMessage("UpdateChecks", html);
+                        List<Issue> issues = Checker.GetBeatmapSetIssues(State.LoadedBeatmapSet);
+                        string html = ChecksRenderer.Render(issues, State.LoadedBeatmapSet);
+                        await SendMessage("UpdateChecks", html);
 
-                            // Reset the lazy loading so in case the map changes and is clicked on
-                            // again we can provide proper snapshots/checks for that.
-                            // Relies on that snapshots are completed before checks, which is currently always the case.
-                            State.LoadedBeatmapSetPath = "";
-                        }
-                        break;
-                    case "RequestSnapshots":
-                        {
-                            LoadBeatmapSet(aValue);
-                            Snapshotter.RelativeDirectory = Path.Combine("resources", "app");
-                            Snapshotter.SnapshotBeatmapSet(State.LoadedBeatmapSet);
-                            string html = SnapshotsRenderer.Render(State.LoadedBeatmapSet);
-                            await SendMessage("UpdateSnapshots", html);
-                        }
-                        break;
-                    default:
-                        break;
-                }
-            }
-            catch (Exception exception)
-            {
-                string html = ExceptionRenderer.Render(exception);
-                await SendMessage("UpdateException", html);
+                        // Reset the lazy loading so in case the map changes and is clicked on
+                        // again we can provide proper snapshots/checks for that.
+                        // Relies on that snapshots are completed before checks, which is currently always the case.
+                        State.LoadedBeatmapSetPath = "";
+                    }
+                    catch (Exception exception)
+                    {
+                        string html = ExceptionRenderer.Render(exception);
+                        await SendMessage("UpdateException", "Checks:" + html);
+                    }
+                    break;
+                case "RequestSnapshots":
+                    try
+                    {
+                        LoadBeatmapSet(aValue);
+                        Snapshotter.RelativeDirectory = Path.Combine("resources", "app");
+                        Snapshotter.SnapshotBeatmapSet(State.LoadedBeatmapSet);
+                        string html = SnapshotsRenderer.Render(State.LoadedBeatmapSet);
+                        await SendMessage("UpdateSnapshots", html);
+                    }
+                    catch (Exception exception)
+                    {
+                        string html = ExceptionRenderer.Render(exception);
+                        await SendMessage("UpdateException", "Snapshots:" + html);
+                    }
+                    break;
+                default:
+                    break;
             }
         }
 
