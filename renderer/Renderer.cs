@@ -119,12 +119,12 @@ namespace MapsetVerifierApp.renderer
         protected static string GetIcon(Issue.Level aLevel)
         {
             return
-                aLevel == Issue.Level.Unrankable ? "cross" :
-                aLevel == Issue.Level.Warning    ? "exclamation" :
-                aLevel == Issue.Level.Minor      ? "minor" :
-                aLevel == Issue.Level.Error      ? "error" :
-                aLevel == Issue.Level.Check      ? "check" :
-                                                   "info";
+                aLevel == Issue.Level.Problem ? "cross" :
+                aLevel == Issue.Level.Warning ? "exclamation" :
+                aLevel == Issue.Level.Minor   ? "minor" :
+                aLevel == Issue.Level.Error   ? "error" :
+                aLevel == Issue.Level.Check   ? "check" :
+                                                "info";
         }
 
         /// <summary> Wraps all timestamps in the string into proper hyperlinks. </summary>
