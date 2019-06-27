@@ -46,7 +46,7 @@ namespace MapsetVerifierApp.renderer
         /// <summary> Surrounds the content in a data attribute of a given type. </summary>
         protected static string DataAttr(string aType, object aContent)
         {
-            return " data-" + aType + "=\"" + aContent + "\"";
+            return " data-" + aType + "=\"" + Encode(aContent.ToString()) + "\"";
         }
 
         /// <summary> Surrounds the content in a tooltip data attribute. </summary>
