@@ -3,7 +3,6 @@
 /bin
 *.csproj
 *.sln
-/snapshots
-/checks
+/resources
 GlobalSuppressions.cs
 bass.dll
