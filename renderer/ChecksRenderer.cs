@@ -162,18 +162,24 @@ namespace MapsetVerifierApp.renderer
 
                     return
                         DivAttr("card-detail",
-                            metadata != null ? DifficultiesDataAttr(metadata.Difficulties) : "",
+                            (metadata != null ? DifficultiesDataAttr(metadata.Difficulties) : "") +
+                            " data-check=\"" + Encode(message) + "\"",
                             Div("card-detail-icon " + GetIcon(issues) + "-icon"),
                             (issues.Any() ?
                             Div("",
                                 Div("card-detail-text",
                                     message
                                 ),
-                                Div("vertical-arrow card-detail-toggle")
+                                DivAttr("vertical-arrow card-detail-toggle detail-shortcut",
+                                    Tooltip("Toggle details")
+                                )
                             ) :
                             Div("card-detail-text",
                                 message
-                            ))
+                            )),
+                            DivAttr("doc-shortcut detail-shortcut",
+                                Tooltip("Show documentation")
+                            )
                         ) +
                         RenderBeatmapDetails(issues);
                 }));
