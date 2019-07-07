@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace MapsetVerifierApp.server
+namespace MapsetVerifierBackend.server
 {
     public static class State
     {

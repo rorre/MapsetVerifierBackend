@@ -1,10 +1,10 @@
-﻿using MapsetVerifier;
-using MapsetVerifier.objects;
-using MapsetVerifierApp.server;
+﻿using MapsetVerifierFramework;
+using MapsetVerifierFramework.objects;
+using MapsetVerifierBackend.server;
 using System;
 using System.Collections.Generic;
 
-namespace MapsetVerifierApp
+namespace MapsetVerifierBackend
 {
     internal static class Program
     {

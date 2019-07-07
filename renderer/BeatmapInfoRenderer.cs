@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace MapsetVerifierApp.renderer
+namespace MapsetVerifierBackend.renderer
 {
     public class BeatmapInfoRenderer : Renderer
     {

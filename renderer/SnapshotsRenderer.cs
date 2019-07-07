@@ -1,16 +1,16 @@
 ﻿using MapsetParser.objects;
 using MapsetSnapshotter;
 using MapsetSnapshotter.objects;
-using MapsetVerifier;
-using MapsetVerifier.objects;
-using MapsetVerifier.objects.metadata;
+using MapsetVerifierFramework;
+using MapsetVerifierFramework.objects;
+using MapsetVerifierFramework.objects.metadata;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace MapsetVerifierApp.renderer
+namespace MapsetVerifierBackend.renderer
 {
     public class SnapshotsRenderer : BeatmapInfoRenderer
     {

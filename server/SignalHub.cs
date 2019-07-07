@@ -1,16 +1,16 @@
 ﻿using MapsetParser.objects;
 using MapsetParser.statics;
 using MapsetSnapshotter;
-using MapsetVerifier;
-using MapsetVerifier.objects;
-using MapsetVerifierApp.renderer;
+using MapsetVerifierFramework;
+using MapsetVerifierFramework.objects;
+using MapsetVerifierBackend.renderer;
 using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace MapsetVerifierApp.server
+namespace MapsetVerifierBackend.server
 {
     public class SignalHub : Hub
     {
