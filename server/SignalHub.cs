@@ -14,8 +14,6 @@ namespace MapsetVerifierBackend.server
 {
     public class SignalHub : Hub
     {
-        public const string relativeCheckPath = "./resources/app/checks";
-
         /// <summary> Returns whether the message was successfully sent or failed. </summary>
         public async Task<bool> SendMessage(string aKey, string aValue)
         {
@@ -53,8 +51,8 @@ namespace MapsetVerifierBackend.server
                 case "RequestDocumentation":
                     try
                     {
-                        Checker.RelativeDLLDirectory = relativeCheckPath;
                         Checker.LoadCheckDLLs();
+
                         string html = DocumentationRenderer.Render();
                         await SendMessage("UpdateDocumentation", html);
                     }
@@ -67,8 +65,8 @@ namespace MapsetVerifierBackend.server
                 case "RequestOverlay":
                     try
                     {
-                        Checker.RelativeDLLDirectory = relativeCheckPath;
                         Checker.LoadCheckDLLs();
+
                         string html = OverlayRenderer.Render(aValue);
                         await SendMessage("UpdateOverlay", html);
                     }
@@ -86,8 +84,6 @@ namespace MapsetVerifierBackend.server
                         await SendMessage("ClearLoad", "");
                         Checker.OnLoadStart = LoadStart;
                         Checker.OnLoadComplete = LoadComplete;
-
-                        Checker.RelativeDLLDirectory = relativeCheckPath;
 
                         List<Issue> issues = Checker.GetBeatmapSetIssues(State.LoadedBeatmapSet);
                         string html = ChecksRenderer.Render(issues, State.LoadedBeatmapSet);
@@ -108,7 +104,7 @@ namespace MapsetVerifierBackend.server
                     try
                     {
                         LoadBeatmapSet(aValue);
-                        Snapshotter.RelativeDirectory = Path.Combine("resources", "app");
+
                         Snapshotter.SnapshotBeatmapSet(State.LoadedBeatmapSet);
                         string html = SnapshotsRenderer.Render(State.LoadedBeatmapSet);
                         await SendMessage("UpdateSnapshots", html);
