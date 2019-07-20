@@ -39,6 +39,8 @@ namespace MapsetVerifierBackend.server
                     Console.WriteLine("Json Options.");
                 });
 
+                services.AddHostedService<Worker>();
+
                 services.AddSignalR();
             }
 
