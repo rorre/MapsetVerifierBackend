@@ -85,57 +85,34 @@ namespace MapsetVerifierBackend.server
                         await SendMessage("UpdateException", "Overlay:" + html);
                     }
                     break;
-                case "RequestChecks":
-                    try
+                case "RequestBeatmapset":
+                    await LoadBeatmapSet(aValue);
+
+                    Func<string, Task>[] actions = new Func<string, Task>[]
                     {
-                        await LoadBeatmapSet(aValue);
-                        if (State.LoadedBeatmapSetPath != aValue)
-                            break;
+                        RequestSnapshots,
+                        RequestChecks
+                    };
 
-                        List<Issue> issues = Checker.GetBeatmapSetIssues(State.LoadedBeatmapSet);
-                        if (State.LoadedBeatmapSetPath != aValue)
-                            break;
+                    if (State.LoadedBeatmapSetPath != aValue)
+                        return;
 
-                        string html = ChecksRenderer.Render(issues, State.LoadedBeatmapSet);
-                        await SendMessage("UpdateChecks", html);
-
-                        // Reset the lazy loading so in case the map changes and is clicked on
-                        // again we can provide proper snapshots/checks for that.
-                        // Relies on that snapshots are completed before checks, which is currently always the case.
-                        State.LoadedBeatmapSetPath = "";
-                    }
-                    catch (Exception exception)
+                    Parallel.ForEach(actions, anAction =>
                     {
-                        string html = ExceptionRenderer.Render(exception);
-                        await SendMessage("UpdateException", "Checks:" + html);
-                    }
-                    break;
-                case "RequestSnapshots":
-                    try
-                    {
-                        await LoadBeatmapSet(aValue);
-                        if (State.LoadedBeatmapSetPath != aValue)
-                            break;
+                        anAction(aValue);
+                    });
 
-                        Snapshotter.SnapshotBeatmapSet(State.LoadedBeatmapSet);
-                        if (State.LoadedBeatmapSetPath != aValue)
-                            break;
+                    // Reset the lazy loading so in case the map changes and is clicked on
+                    // again we can provide proper snapshots/checks for that.
+                    // Relies on that snapshots are completed before checks, which is currently always the case.
+                    State.LoadedBeatmapSetPath = "";
 
-                        string html = SnapshotsRenderer.Render(State.LoadedBeatmapSet);
-                        await SendMessage("UpdateSnapshots", html);
-                    }
-                    catch (Exception exception)
-                    {
-                        string html = ExceptionRenderer.Render(exception);
-                        await SendMessage("UpdateException", "Snapshots:" + html);
-                    }
                     break;
                 default:
                     break;
             }
         }
 
-        // Keeps a thread of beatmap loading, allowing cancling upon loading another.
         private static async Task<bool> LoadBeatmapSet(string aSongFolderPath)
         {
             if (State.LoadedBeatmapSetPath != aSongFolderPath)
@@ -154,6 +131,42 @@ namespace MapsetVerifierBackend.server
             }
 
             return false;
+        }
+
+        private static async Task RequestSnapshots(string aBeatmapSetPath)
+        {
+            try
+            {
+                Snapshotter.SnapshotBeatmapSet(State.LoadedBeatmapSet);
+                if (State.LoadedBeatmapSetPath != aBeatmapSetPath)
+                    return;
+
+                string html = SnapshotsRenderer.Render(State.LoadedBeatmapSet);
+                await SendMessage("UpdateSnapshots", html);
+            }
+            catch (Exception exception)
+            {
+                string html = ExceptionRenderer.Render(exception);
+                await SendMessage("UpdateException", "Snapshots:" + html);
+            }
+        }
+
+        private static async Task RequestChecks(string aBeatmapSetPath)
+        {
+            try
+            {
+                List<Issue> issues = Checker.GetBeatmapSetIssues(State.LoadedBeatmapSet);
+                if (State.LoadedBeatmapSetPath != aBeatmapSetPath)
+                    return;
+
+                string html = ChecksRenderer.Render(issues, State.LoadedBeatmapSet);
+                await SendMessage("UpdateChecks", html);
+            }
+            catch (Exception exception)
+            {
+                string html = ExceptionRenderer.Render(exception);
+                await SendMessage("UpdateException", "Checks:" + html);
+            }
         }
 
         protected override Task ExecuteAsync(CancellationToken aStoppingToken)
