@@ -15,7 +15,7 @@ namespace MapsetVerifierBackend.renderer
             // Only the innermost exception is important, MapsetVerifier runs a lot of things in
             // parallel so many exceptions will be aggregates and not provide any useful information.
             Exception printedException = anException;
-            while (printedException.InnerException != null)
+            while (printedException.InnerException != null && (printedException is AggregateException))
                 printedException = printedException.InnerException;
 
             string printedCheckBox =
