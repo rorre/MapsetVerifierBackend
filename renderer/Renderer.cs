@@ -131,7 +131,7 @@ namespace MapsetVerifierBackend.renderer
         protected static string FormatTimestamps(string aMessage)
         {
             string formattedMessage = aMessage;
-            Regex stampRegex = new Regex("\\d\\d:\\d\\d:\\d\\d\\d( \\([\\d,]+\\))?");
+            Regex stampRegex = new Regex(@"\d\d:\d\d:\d\d\d( \([\d|,]+\))?");
             foreach (string value in stampRegex.Matches(aMessage).Cast<Match>().Select(aMatch => aMatch.Value).Distinct())
                 formattedMessage = formattedMessage.Replace(value, TimestampLink(value));
 
