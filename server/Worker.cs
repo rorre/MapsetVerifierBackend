@@ -60,8 +60,6 @@ namespace MapsetVerifierBackend.server
                 case "RequestDocumentation":
                     try
                     {
-                        Checker.LoadCheckDLLs();
-
                         string html = DocumentationRenderer.Render();
                         await SendMessage("UpdateDocumentation", html);
                     }
@@ -74,8 +72,6 @@ namespace MapsetVerifierBackend.server
                 case "RequestOverlay":
                     try
                     {
-                        Checker.LoadCheckDLLs();
-
                         string html = OverlayRenderer.Render(aValue);
                         await SendMessage("UpdateOverlay", html);
                     }

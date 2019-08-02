@@ -12,8 +12,10 @@ namespace MapsetVerifierBackend
     {
         static void Main(string[] args)
         {
-            Checker.RelativeDLLDirectory  = Path.Combine("resources", "app", "checks");
-            Snapshotter.RelativeDirectory = Path.Combine("resources", "app");
+            Checker.RelativeDLLDirectory  = Path.Combine("..", "Mapset Verifier Externals", "checks");
+            Snapshotter.RelativeDirectory = Path.Combine("..", "Mapset Verifier Externals");
+
+            Checker.LoadCheckDLLs();
 
             Host.Initialize();
         }
