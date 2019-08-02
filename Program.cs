@@ -15,7 +15,9 @@ namespace MapsetVerifierBackend
             Checker.RelativeDLLDirectory  = Path.Combine("..", "Mapset Verifier Externals", "checks");
             Snapshotter.RelativeDirectory = Path.Combine("..", "Mapset Verifier Externals");
 
+            // Loads both external check plugins as well as the default auto-updated one.
             Checker.LoadCheckDLLs();
+            Checker.LoadCheckDLL(Path.Combine("resources", "app", "checks", "MapsetChecks.dll"));
 
             Host.Initialize();
         }
