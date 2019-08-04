@@ -74,7 +74,7 @@ namespace MapsetVerifierBackend.renderer
                         return
                             DivAttr("card-difficulty",
                                 DataAttr("difficulty", version),
-                                RenderBeatmapInterpretation(aBeatmap, aBeatmap.GetDifficulty()),
+                                RenderBeatmapInterpretation(aBeatmap, aBeatmap.GetDifficulty(true)),
                                 RenderBeatmapCategories(issues, version)
                             );
                     }))
