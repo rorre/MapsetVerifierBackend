@@ -82,26 +82,35 @@ namespace MapsetVerifierBackend.server
                     }
                     break;
                 case "RequestBeatmapset":
-                    await LoadBeatmapSet(aValue);
-
-                    Func<string, Task>[] actions = new Func<string, Task>[]
+                    try
                     {
+                        await LoadBeatmapSet(aValue);
+
+                        Func<string, Task>[] actions = new Func<string, Task>[]
+                        {
                         RequestSnapshots,
                         RequestChecks
-                    };
+                        };
 
-                    if (State.LoadedBeatmapSetPath != aValue)
-                        return;
+                        if (State.LoadedBeatmapSetPath != aValue)
+                            return;
 
-                    Parallel.ForEach(actions, anAction =>
+                        Parallel.ForEach(actions, anAction =>
+                        {
+                            anAction(aValue);
+                        });
+
+                        // Reset the lazy loading so in case the map changes and is clicked on
+                        // again we can provide proper snapshots/checks for that.
+                        // Relies on that snapshots are completed before checks, which is currently always the case.
+                        State.LoadedBeatmapSetPath = "";
+                    }
+                    catch (Exception exception)
                     {
-                        anAction(aValue);
-                    });
-
-                    // Reset the lazy loading so in case the map changes and is clicked on
-                    // again we can provide proper snapshots/checks for that.
-                    // Relies on that snapshots are completed before checks, which is currently always the case.
-                    State.LoadedBeatmapSetPath = "";
+                        string html = ExceptionRenderer.Render(exception);
+                        await SendMessage("UpdateException", "Checks:" + html);
+                        await SendMessage("UpdateException", "Snapshots:" + html);
+                    }
 
                     break;
                 default:
