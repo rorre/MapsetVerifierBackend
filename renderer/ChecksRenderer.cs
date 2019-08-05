@@ -29,7 +29,7 @@ namespace MapsetVerifierBackend.renderer
                 Div("beatmap-difficulties",
 
                     DivAttr("beatmap-difficulty noselect",
-                        DataAttr("difficulty", "General"),
+                        DataAttr("difficulty", "General") + DataAttr("beatmap-id", "-"),
                         Div("medium-icon " + GetIcon(generalIssues) + "-icon"),
                         Div("difficulty-name",
                             "General"
@@ -41,9 +41,10 @@ namespace MapsetVerifierBackend.renderer
                     {
                         IEnumerable<Issue> issues = anIssues.Where(anIssue => anIssue.beatmap == aBeatmap).Except(generalIssues);
                         string version = Encode(aBeatmap.metadataSettings.version);
+                        string beatmapId = Encode(aBeatmap.metadataSettings.beatmapId.ToString());
                         return
                             DivAttr("beatmap-difficulty noselect" + (aBeatmap == refBeatmap ? " beatmap-difficulty-selected" : ""),
-                                DataAttr("difficulty", version),
+                                DataAttr("difficulty", version) + DataAttr("beatmap-id", beatmapId),
                                 Div("medium-icon " + GetIcon(issues) + "-icon"),
                                 Div("difficulty-name",
                                     version
