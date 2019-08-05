@@ -31,6 +31,14 @@ namespace MapsetVerifierBackend.renderer
                         ) :
                         DivAttr("beatmap-option beatmap-option-filter no-click web-unavailable-icon",
                             Tooltip("No beatmap page available")
+                        )),
+                        (refBeatmap.metadataSettings.beatmapSetId != null ?
+                        DivAttr("beatmap-options-discussion beatmap-option beatmap-option-filter discussion-icon",
+                            DataAttr("setid", Encode(refBeatmap.metadataSettings.beatmapSetId.ToString())) +
+                            Tooltip("Open discussion page for selected difficulty")
+                        ) :
+                        DivAttr("beatmap-option beatmap-option-filter no-click discussion-unavailable-icon",
+                            Tooltip("No discussion page available")
                         ))
                     )
                 );
