@@ -84,7 +84,7 @@ namespace MapsetVerifierBackend.server
                 case "RequestBeatmapset":
                     try
                     {
-                        await LoadBeatmapSet(aValue);
+                        LoadBeatmapSet(aValue);
 
                         Func<string, Task>[] actions = new Func<string, Task>[]
                         {
@@ -99,11 +99,6 @@ namespace MapsetVerifierBackend.server
                         {
                             anAction(aValue);
                         });
-
-                        // Reset the lazy loading so in case the map changes and is clicked on
-                        // again we can provide proper snapshots/checks for that.
-                        // Relies on that snapshots are completed before checks, which is currently always the case.
-                        State.LoadedBeatmapSetPath = "";
                     }
                     catch (Exception exception)
                     {
@@ -118,24 +113,17 @@ namespace MapsetVerifierBackend.server
             }
         }
 
-        private static async Task<bool> LoadBeatmapSet(string aSongFolderPath)
+        private static void LoadBeatmapSet(string aSongFolderPath)
         {
-            if (State.LoadedBeatmapSetPath != aSongFolderPath)
-            {
-                State.LoadedBeatmapSetPath = aSongFolderPath;
+            State.LoadedBeatmapSetPath = aSongFolderPath;
 
-                Checker.OnLoadStart = LoadStart;
-                Checker.OnLoadComplete = LoadComplete;
+            Checker.OnLoadStart = LoadStart;
+            Checker.OnLoadComplete = LoadComplete;
 
-                EventStatic.OnLoadStart = LoadStart;
-                EventStatic.OnLoadComplete = LoadComplete;
+            EventStatic.OnLoadStart = LoadStart;
+            EventStatic.OnLoadComplete = LoadComplete;
                 
-                State.LoadedBeatmapSet = new BeatmapSet(aSongFolderPath);
-
-                return true;
-            }
-
-            return false;
+            State.LoadedBeatmapSet = new BeatmapSet(aSongFolderPath);
         }
 
         private static async Task RequestSnapshots(string aBeatmapSetPath)
