@@ -40,7 +40,6 @@ namespace MapsetVerifierBackend.server
 
         public static async Task SendMessage(string aKey, string aValue)
         {
-            Console.WriteLine("Sending message with key \"" + aKey + "\".");
             try
             {
                 await hub.Clients.All.SendAsync("ServerMessage", aKey, aValue);
@@ -53,8 +52,6 @@ namespace MapsetVerifierBackend.server
 
         public static async Task ClientMessage(string aKey, string aValue)
         {
-            Console.WriteLine("Received message with key \"" + aKey + "\", and value \"" + aValue + "\".");
-
             switch (aKey)
             {
                 case "RequestDocumentation":
