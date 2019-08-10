@@ -39,6 +39,14 @@ namespace MapsetVerifierBackend.renderer
                         ) :
                         DivAttr("beatmap-option beatmap-option-filter no-click discussion-unavailable-icon",
                             Tooltip("No discussion page available")
+                        )),
+                        (refBeatmap.metadataSettings.beatmapSetId != null ?
+                        DivAttr("beatmap-options-link beatmap-option beatmap-option-filter link-icon",
+                            DataAttr("setid", Encode(refBeatmap.metadataSettings.beatmapSetId.ToString())) +
+                            Tooltip("Open osu!direct panel (osu!supporter only)")
+                        ) :
+                        DivAttr("beatmap-option beatmap-option-filter no-click link-unavailable-icon",
+                            Tooltip("No osu!direct panel available")
                         ))
                     )
                 );
