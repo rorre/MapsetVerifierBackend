@@ -86,7 +86,8 @@ namespace MapsetVerifierBackend.server
                         Func<string, Task>[] actions = new Func<string, Task>[]
                         {
                         RequestSnapshots,
-                        RequestChecks
+                        RequestChecks,
+                        RequestOverview
                         };
 
                         if (State.LoadedBeatmapSetPath != aValue)
@@ -102,6 +103,7 @@ namespace MapsetVerifierBackend.server
                         string html = ExceptionRenderer.Render(exception);
                         await SendMessage("UpdateException", "Checks:" + html);
                         await SendMessage("UpdateException", "Snapshots:" + html);
+                        await SendMessage("UpdateException", "Overview:" + html);
                     }
 
                     break;
@@ -156,6 +158,23 @@ namespace MapsetVerifierBackend.server
             {
                 string html = ExceptionRenderer.Render(exception);
                 await SendMessage("UpdateException", "Checks:" + html);
+            }
+        }
+
+        private static async Task RequestOverview(string aBeatmapSetPath)
+        {
+            try
+            {
+                if (State.LoadedBeatmapSetPath != aBeatmapSetPath)
+                    return;
+
+                string html = OverviewRenderer.Render(State.LoadedBeatmapSet);
+                await SendMessage("UpdateOverview", html);
+            }
+            catch (Exception exception)
+            {
+                string html = ExceptionRenderer.Render(exception);
+                await SendMessage("UpdateException", "Overview:" + html);
             }
         }
 
