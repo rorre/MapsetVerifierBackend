@@ -103,6 +103,9 @@ namespace MapsetVerifierBackend.renderer
         /// <summary> Returns the same string but HTML encoded, meaning greater and less than signs no longer form actual tags. </summary>
         public static string Encode(string aString)
         {
+            if (aString == null)
+                return null;
+
             return WebUtility.HtmlEncode(aString);
         }
 
@@ -130,6 +133,9 @@ namespace MapsetVerifierBackend.renderer
         /// <summary> Wraps all timestamps in the string into proper hyperlinks. </summary>
         protected static string FormatTimestamps(string aMessage)
         {
+            if (aMessage == null)
+                return null;
+
             string formattedMessage = aMessage;
             Regex stampRegex = new Regex(@"\d\d:\d\d:\d\d\d( \([\d|,]+\))?");
             foreach (string value in stampRegex.Matches(aMessage).Cast<Match>().Select(aMatch => aMatch.Value).Distinct())
