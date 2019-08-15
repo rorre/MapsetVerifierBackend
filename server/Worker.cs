@@ -30,12 +30,14 @@ namespace MapsetVerifierBackend.server
         {
             await SendMessage("AddLoad", "Checks:" + Renderer.Encode(aLoadMessage));
             await SendMessage("AddLoad", "Snapshots:" + Renderer.Encode(aLoadMessage));
+            await SendMessage("AddLoad", "Overview:" + Renderer.Encode(aLoadMessage));
         }
 
         private static async Task LoadComplete(string aLoadMessage)
         {
             await SendMessage("RemoveLoad", "Checks:" + Renderer.Encode(aLoadMessage));
             await SendMessage("RemoveLoad", "Snapshots:" + Renderer.Encode(aLoadMessage));
+            await SendMessage("RemoveLoad", "Overview:" + Renderer.Encode(aLoadMessage));
         }
 
         public static async Task SendMessage(string aKey, string aValue)
