@@ -426,13 +426,18 @@ namespace MapsetVerifierBackend.renderer
 
                         AudioFile audioFile = new AudioFile(path);
 
-                        if (audioFile.GetLowestBitrate() == audioFile.GetHighestBitrate())
-                            return $"CBR, {audioFile.GetLowestBitrate() / 1000:0.##} kbps";
-                        else
-                            return
-                                $"VBR, {audioFile.GetLowestBitrate() / 1000:0.##} kbps to {audioFile.GetHighestBitrate() / 1000:0.##} kbps, " +
-                                $"average {audioFile.GetAverageBitrate() / 1000:0.##} kbps";
-                    }),
+                        return
+                            Div("overview-float",
+                                (audioFile.GetLowestBitrate() == audioFile.GetHighestBitrate() ?
+                                    $"CBR, {audioFile.GetLowestBitrate() / 1000:0.##} kbps" :
+                                    $"VBR, {audioFile.GetLowestBitrate() / 1000:0.##} kbps to {audioFile.GetHighestBitrate() / 1000:0.##} kbps, " +
+                                    $"average {audioFile.GetAverageBitrate() / 1000:0.##} kbps")
+                            ) +
+                            (audioFile.HasXingHeader() ?
+                            Div("overview-float",
+                                "has Xing header"
+                            ) : "");
+                    }, false),
                     RenderField("Has .osb",
                          Encode((aBeatmapSet.osb?.IsUsed() ?? false).ToString())
                     ),
