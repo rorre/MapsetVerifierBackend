@@ -39,7 +39,9 @@ namespace MapsetVerifierBackend.renderer
                             return
                                 DivAttr("interpret" + (
                                 anIndex == snapshotDates.Count - 2 ? " interpret-selected" :
-                                anIndex == snapshotDates.Count - 1 ? " interpret-default" : ""),
+                                anIndex == snapshotDates.Count - 1 ?
+                                    " interpret-default" + (snapshotDates.Count == 1 ? " interpret-selected" : "") : ""),
+
                                     DataAttr("interpret-severity", anIndex),
                                     aDate.ToString("yyyy-MM-dd HH:mm:ss")
                                 );
