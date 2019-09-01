@@ -555,7 +555,8 @@ namespace MapsetVerifierBackend.renderer
                 content.Append(
                     RenderBeatmapContent(aBeatmapSet, $"Combo {i + 1}", aBeatmap =>
                     {
-                        if (aBeatmap.generalSettings.mode == Beatmap.Mode.Taiko)
+                        if (aBeatmap.generalSettings.mode == Beatmap.Mode.Taiko ||
+                            aBeatmap.generalSettings.mode == Beatmap.Mode.Mania)
                             return "N/A";
 
                         Vector3? comboColour = null;
@@ -584,7 +585,8 @@ namespace MapsetVerifierBackend.renderer
             content.Append(
                 RenderBeatmapContent(aBeatmapSet, $"Slider Border", aBeatmap =>
                 {
-                    if (aBeatmap.generalSettings.mode == Beatmap.Mode.Taiko)
+                    if (aBeatmap.generalSettings.mode == Beatmap.Mode.Taiko ||
+                        aBeatmap.generalSettings.mode == Beatmap.Mode.Mania)
                         return "N/A";
 
                     Vector3? comboColour = aBeatmap.colourSettings.sliderBorder;
@@ -603,7 +605,8 @@ namespace MapsetVerifierBackend.renderer
                 }, false) +
                 RenderBeatmapContent(aBeatmapSet, $"Slider Track", aBeatmap =>
                 {
-                    if (aBeatmap.generalSettings.mode == Beatmap.Mode.Taiko)
+                    if (aBeatmap.generalSettings.mode == Beatmap.Mode.Taiko ||
+                        aBeatmap.generalSettings.mode == Beatmap.Mode.Mania)
                         return "N/A";
 
                     Vector3? comboColour = aBeatmap.colourSettings.sliderTrackOverride;
