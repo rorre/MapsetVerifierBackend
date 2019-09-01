@@ -633,8 +633,11 @@ namespace MapsetVerifierBackend.renderer
         // Returns a single field if all values are equal, otherwise multiple.
         private static string RenderBeatmapContent(BeatmapSet aBeatmapSet, string aTitle, Func<Beatmap, string> aFunc, bool aEncode = true)
         {
-            string refContent = aFunc(aBeatmapSet.beatmaps.FirstOrDefault());
-            if(aBeatmapSet.beatmaps.Any(aBeatmap => aFunc(aBeatmap) != refContent))
+            Dictionary<Beatmap, string> beatmapContent = new Dictionary<Beatmap, string>();
+            foreach (Beatmap beatmap in aBeatmapSet.beatmaps)
+                beatmapContent[beatmap] = aFunc(beatmap);
+
+            if(beatmapContent.Any(aPair => aPair.Value != beatmapContent.First().Value))
                 return
                     RenderField(aTitle,
                         String.Concat(
@@ -643,8 +646,8 @@ namespace MapsetVerifierBackend.renderer
                             return
                                 RenderField(aBeatmap.metadataSettings.version,
                                     aEncode ?
-                                        FormatTimestamps(Encode(aFunc(aBeatmap))) :
-                                        aFunc(aBeatmap)
+                                        FormatTimestamps(Encode(beatmapContent[aBeatmap])) :
+                                        beatmapContent[aBeatmap]
                                 );
                         }))
                     );
@@ -652,8 +655,8 @@ namespace MapsetVerifierBackend.renderer
                 return
                     RenderField(aTitle,
                         aEncode ?
-                            FormatTimestamps(Encode(refContent)) :
-                            refContent
+                            FormatTimestamps(Encode(beatmapContent.First().Value)) :
+                            beatmapContent.First().Value
                     );
         }
 
