@@ -11,7 +11,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="BASS" Version="2.4.12.1" />
     <PackageReference Include="ManagedBass" Version="2.0.4" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Routing" Version="2.2.2" />
@@ -20,18 +19,6 @@
     <PackageReference Include="Microsoft.Packaging.Tools.Trimming" Version="1.1.0-preview1-25818-01" />
     <PackageReference Include="NAudio" Version="1.9.0" />
     <PackageReference Include="TagLib.Portable" Version="1.0.4" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="MapsetParser">
-      <HintPath>..\MapsetParser\bin\Debug\netcoreapp2.0\MapsetParser.dll</HintPath>
-    </Reference>
-    <Reference Include="MapsetSnapshotter">
-      <HintPath>..\MapsetSnapshotter\bin\Debug\netcoreapp2.0\MapsetSnapshotter.dll</HintPath>
-    </Reference>
-    <Reference Include="MapsetVerifierFramework">
-      <HintPath>..\MapsetVerifierFramework\bin\Debug\netcoreapp2.0\MapsetVerifierFramework.dll</HintPath>
-    </Reference>
   </ItemGroup>
 
 </Project>
