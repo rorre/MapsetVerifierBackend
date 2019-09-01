@@ -323,7 +323,7 @@ namespace MapsetVerifierBackend.renderer
 
             return
                 RenderContainer("Resources",
-                    RenderBeatmapContent(aBeatmapSet, "Used Hit Sound Files", aBeatmap =>
+                    RenderBeatmapContent(aBeatmapSet, "Used Hit Sound File(s)", aBeatmap =>
                     {
                         List<string> usedHitSoundFiles =
                             aBeatmap.hitObjects.SelectMany(anObject => anObject.GetUsedHitSoundFiles()).ToList();
@@ -346,7 +346,7 @@ namespace MapsetVerifierBackend.renderer
                                 return $"× {count}";
                             });
                     }, false),
-                    RenderField("Total Used Hit Sound Files",
+                    RenderField("Total Used Hit Sound File(s)",
                         (hsUsedCount.Any() ?
                             Div("overview-float",
                                 String.Join("<br>",
@@ -394,56 +394,50 @@ namespace MapsetVerifierBackend.renderer
                             )
                         : "")
                     ),
-                    RenderBeatmapContent(aBeatmapSet, "Audio File", aBeatmap =>
+                    RenderBeatmapContent(aBeatmapSet, "Background File(s)", aBeatmap =>
                     {
-                        string path = aBeatmap.GetAudioFilePath();
-                        if (path == null)
+                        if (aBeatmap.backgrounds.Any())
+                        {
+                            string fullPath = Path.Combine(aBeatmap.songPath, aBeatmap.backgrounds.First().path);
+                            if (!File.Exists(fullPath))
+                                return "";
+
+                            string error = null;
+                            TagLib.File tagFile = null;
+                            try
+                            { tagFile = new FileAbstraction(fullPath).GetTagFile(); }
+                            catch (Exception exception)
+                            {
+                                error = exception.Message;
+                            }
+
+                            if (error != null || tagFile == null)
+                                return
+                                    Div("overview-float",
+                                        Encode(aBeatmap.backgrounds.First().path)
+                                    ) +
+                                    Div("overview-float",
+                                        Encode(RenderFileSize(fullPath))
+                                    ) +
+                                    Div("overview-float",
+                                        Encode($"(failed getting proprties; {error})")
+                                    );
+
+                            return
+                                Div("overview-float",
+                                    Encode(aBeatmap.backgrounds.First().path)
+                                ) +
+                                Div("overview-float",
+                                    Encode(RenderFileSize(fullPath))
+                                ) +
+                                Div("overview-float",
+                                    Encode(tagFile.Properties.PhotoWidth + " x " + tagFile.Properties.PhotoHeight)
+                                );
+                        }
+                        else
                             return "";
-
-                        FileInfo fileInfo = new FileInfo(path);
-                        ManagedBass.ChannelType format = Audio.GetFormat(path);
-                        double duration = Audio.GetDuration(path);
-
-                        return
-                            Div("overview-float",
-                                Encode(PathStatic.RelativePath(path, aBeatmap.songPath))
-                            ) +
-                            Div("overview-float",
-                                Encode(RenderFileSize(path))
-                            ) +
-                            Div("overview-float",
-                                FormatTimestamps(Encode(Timestamp.Get(duration)))
-                            ) +
-                            Div("overview-float",
-                                Encode(Audio.EnumToString(format))
-                            );
                     }, false),
-                    RenderBeatmapContent(aBeatmapSet, "Audio Bitrate", aBeatmap =>
-                    {
-                        string path = aBeatmap.GetAudioFilePath();
-                        if (path == null)
-                            return "N/A";
-
-                        AudioFile audioFile = new AudioFile(path);
-
-                        return
-                            Div("overview-float",
-                                (audioFile.GetLowestBitrate() == audioFile.GetHighestBitrate() ?
-                                    $"CBR, {audioFile.GetLowestBitrate() / 1000:0.##} kbps" :
-                                    $"VBR, {audioFile.GetLowestBitrate() / 1000:0.##} kbps to {audioFile.GetHighestBitrate() / 1000:0.##} kbps, " +
-                                    $"average {audioFile.GetAverageBitrate() / 1000:0.##} kbps")
-                            ) +
-                            (audioFile.HasXingHeader() ?
-                            Div("overview-float",
-                                "has Xing header"
-                            ) : "");
-                    }, false),
-                    RenderField("Has .osb",
-                         Encode((aBeatmapSet.osb?.IsUsed() ?? false).ToString())
-                    ),
-                    RenderBeatmapContent(aBeatmapSet, "Has .osu Specific Storyboard", aBeatmap =>
-                        aBeatmap.HasDifficultySpecificStoryboard().ToString()),
-                    RenderBeatmapContent(aBeatmapSet, "Video File", aBeatmap =>
+                    RenderBeatmapContent(aBeatmapSet, "Video File(s)", aBeatmap =>
                     {
                         if (aBeatmap.videos.Any() || (aBeatmapSet.osb?.videos.Any() ?? false))
                         {
@@ -489,6 +483,51 @@ namespace MapsetVerifierBackend.renderer
                         else
                             return "";
                     }, false),
+                    RenderBeatmapContent(aBeatmapSet, "Audio File(s)", aBeatmap =>
+                    {
+                        string path = aBeatmap.GetAudioFilePath();
+                        if (path == null)
+                            return "";
+
+                        FileInfo fileInfo = new FileInfo(path);
+                        ManagedBass.ChannelType format = Audio.GetFormat(path);
+                        double duration = Audio.GetDuration(path);
+
+                        return
+                            Div("overview-float",
+                                Encode(PathStatic.RelativePath(path, aBeatmap.songPath))
+                            ) +
+                            Div("overview-float",
+                                Encode(RenderFileSize(path))
+                            ) +
+                            Div("overview-float",
+                                FormatTimestamps(Encode(Timestamp.Get(duration)))
+                            ) +
+                            Div("overview-float",
+                                Encode(Audio.EnumToString(format))
+                            );
+                    }, false),
+                    RenderBeatmapContent(aBeatmapSet, "Audio Bitrate", aBeatmap =>
+                    {
+                        string path = aBeatmap.GetAudioFilePath();
+                        if (path == null)
+                            return "N/A";
+
+                        AudioFile audioFile = new AudioFile(path);
+
+                        return
+                            Div("overview-float",
+                                (audioFile.GetLowestBitrate() == audioFile.GetHighestBitrate() ?
+                                    $"CBR, {audioFile.GetLowestBitrate() / 1000:0.##} kbps" :
+                                    $"VBR, {audioFile.GetLowestBitrate() / 1000:0.##} kbps to {audioFile.GetHighestBitrate() / 1000:0.##} kbps, " +
+                                    $"average {audioFile.GetAverageBitrate() / 1000:0.##} kbps")
+                            );
+                    }, false),
+                    RenderField("Has .osb",
+                         Encode((aBeatmapSet.osb?.IsUsed() ?? false).ToString())
+                    ),
+                    RenderBeatmapContent(aBeatmapSet, "Has .osu Specific Storyboard", aBeatmap =>
+                        aBeatmap.HasDifficultySpecificStoryboard().ToString()),
                     RenderBeatmapContent(aBeatmapSet, "Song Folder Size", aBeatmap =>
                         RenderDirectorySize(aBeatmap.songPath))
                 );

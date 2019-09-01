@@ -1,0 +1,3 @@
+[submodule "MapsetVerifierFramework"]
+	path = MapsetVerifierFramework
+	url = https://github.com/Naxesss/MapsetVerifierFramework
