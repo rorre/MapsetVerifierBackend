@@ -6,3 +6,7 @@
 	path = MapsetSnapshotter
 	url = https://github.com/Naxesss/MapsetSnapshotter
 	branch = master
+[submodule "MapsetParser"]
+	path = MapsetParser
+	url = https://github.com/Naxesss/MapsetParser
+	branch = master
