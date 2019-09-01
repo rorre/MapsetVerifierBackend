@@ -2,3 +2,7 @@
 	path = MapsetVerifierFramework
 	url = https://github.com/Naxesss/MapsetVerifierFramework
 	branch = master
+[submodule "MapsetSnapshotter"]
+	path = MapsetSnapshotter
+	url = https://github.com/Naxesss/MapsetSnapshotter
+	branch = master
