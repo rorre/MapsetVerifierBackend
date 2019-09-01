@@ -576,7 +576,7 @@ namespace MapsetVerifierBackend.renderer
                             return
                                 DivAttr("overview-colour",
                                     DataAttr("colour", comboColour?.X + "," + comboColour?.Y + "," + comboColour?.Z) +
-                                    Tooltip($"Luminosity {GetLuminosity(comboColour.GetValueOrDefault()):0.#}, less than 43 or greater than 250 in kiai is bad.")
+                                    Tooltip($"HSP luminosity {GetLuminosity(comboColour.GetValueOrDefault()):0.#}, less than 43 or greater than 250 in kiai is bad.")
                                 );
                     }, false));
             }
@@ -600,7 +600,7 @@ namespace MapsetVerifierBackend.renderer
                         return
                             DivAttr("overview-colour",
                                 DataAttr("colour", comboColour?.X + "," + comboColour?.Y + "," + comboColour?.Z) +
-                                    Tooltip($"Luminosity {GetLuminosity(comboColour.GetValueOrDefault()):0.#}, less than 43 or greater than 250 in kiai is bad.")
+                                    Tooltip($"HSP luminosity {GetLuminosity(comboColour.GetValueOrDefault()):0.#}, less than 43 is bad.")
                             );
                 }, false) +
                 RenderBeatmapContent(aBeatmapSet, $"Slider Track", aBeatmap =>
@@ -620,7 +620,7 @@ namespace MapsetVerifierBackend.renderer
                         return
                             DivAttr("overview-colour",
                                 DataAttr("colour", comboColour?.X + "," + comboColour?.Y + "," + comboColour?.Z) +
-                                    Tooltip($"Luminosity {GetLuminosity(comboColour.GetValueOrDefault()):0.#}, less than 43 or greater than 250 in kiai is bad.")
+                                    Tooltip($"HSP luminosity {GetLuminosity(comboColour.GetValueOrDefault()):0.#}")
                             );
                 }, false));
 
