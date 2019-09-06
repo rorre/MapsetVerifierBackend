@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using MapsetSnapshotter;
 using System.IO;
+using System.Globalization;
 
 namespace MapsetVerifierBackend
 {
@@ -12,6 +13,10 @@ namespace MapsetVerifierBackend
     {
         static void Main(string[] args)
         {
+            // Ensures that numbers are displayed consistently across cultures, for example
+            // that decimals are indicated by a period and not a comma.
+            CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
+
             string appdataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             Checker.RelativeDLLDirectory  = Path.Combine(appdataPath, "Mapset Verifier Externals", "checks");
             Snapshotter.RelativeDirectory = Path.Combine(appdataPath, "Mapset Verifier Externals");
