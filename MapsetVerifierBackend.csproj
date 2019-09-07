@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -19,6 +19,18 @@
     <PackageReference Include="Microsoft.Packaging.Tools.Trimming" Version="1.1.0-preview1-25818-01" />
     <PackageReference Include="NAudio" Version="1.9.0" />
     <PackageReference Include="TagLib.Portable" Version="1.0.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="MapsetParser">
+      <HintPath>..\MapsetParser\bin\Debug\netcoreapp2.0\MapsetParser.dll</HintPath>
+    </Reference>
+    <Reference Include="MapsetSnapshotter">
+      <HintPath>..\MapsetSnapshotter\bin\Debug\netcoreapp2.0\MapsetSnapshotter.dll</HintPath>
+    </Reference>
+    <Reference Include="MapsetVerifierFramework">
+      <HintPath>..\MapsetVerifierFramework\bin\Debug\netcoreapp2.0\MapsetVerifierFramework.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>
