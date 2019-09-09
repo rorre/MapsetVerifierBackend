@@ -326,7 +326,7 @@ namespace MapsetVerifierBackend.renderer
                     RenderBeatmapContent(aBeatmapSet, "Used Hit Sound File(s)", aBeatmap =>
                     {
                         List<string> usedHitSoundFiles =
-                            aBeatmap.hitObjects.SelectMany(anObject => anObject.GetUsedHitSoundFiles()).ToList();
+                            aBeatmap.hitObjects.SelectMany(anObject => anObject.GetUsedHitSoundFileNames()).ToList();
 
                         List<string> distinctSortedFiles =
                             usedHitSoundFiles.Distinct().OrderByDescending(aFile => aFile).ToList();
