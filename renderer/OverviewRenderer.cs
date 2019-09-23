@@ -557,8 +557,21 @@ namespace MapsetVerifierBackend.renderer
                         else
                             return "N/A";
                     }),
+                    RenderBeatmapContent(aBeatmapSet, "New Combo Count", aBeatmap =>
+                         aBeatmap.hitObjects.Where(anObject => anObject.type.HasFlag(HitObject.Type.NewCombo)).Count().ToString(CultureInfo.InvariantCulture)),
                     RenderBeatmapContent(aBeatmapSet, "Break Count", aBeatmap =>
                         aBeatmap.breaks.Count().ToString(CultureInfo.InvariantCulture)),
+                    RenderBeatmapContent(aBeatmapSet, "Uninherited Lines", aBeatmap =>
+                        aBeatmap.timingLines.OfType<UninheritedLine>().Count().ToString(CultureInfo.InvariantCulture)),
+                    RenderBeatmapContent(aBeatmapSet, "Inherited Lines", aBeatmap =>
+                        aBeatmap.timingLines.OfType<InheritedLine>().Count().ToString(CultureInfo.InvariantCulture)),
+                    RenderBeatmapContent(aBeatmapSet, "Kiai Time", aBeatmap =>
+                        Timestamp.Get(aBeatmap.timingLines.Select(aLine =>
+                            aLine.kiai ?
+                                (aBeatmap.GetNextTimingLine(aLine.offset)?.offset ??
+                                    aBeatmap.hitObjects.First().time + aBeatmap.GetPlayTime())
+                                - aLine.offset : 0).Sum())
+                        .ToString(CultureInfo.InvariantCulture)),
                     RenderBeatmapContent(aBeatmapSet, "Drain Time", aBeatmap =>
                         Timestamp.Get(aBeatmap.GetDrainTime()).ToString(CultureInfo.InvariantCulture)),
                     RenderBeatmapContent(aBeatmapSet, "Play Time", aBeatmap =>
