@@ -1,5 +1,6 @@
 ﻿using MapsetParser.objects;
 using MapsetParser.objects.hitobjects;
+using MapsetParser.objects.timinglines;
 using MapsetParser.settings;
 using MapsetParser.statics;
 using MapsetVerifierFramework.objects.resources;
@@ -20,6 +21,7 @@ namespace MapsetVerifierBackend.renderer
             return String.Concat(
                     RenderBeatmapInfo(aBeatmapSet),
                     Div("paste-separator"),
+                    RenderTimelineComparison(aBeatmapSet),
                     RenderMetadata(aBeatmapSet),
                     RenderGeneralSettings(aBeatmapSet),
                     RenderDifficultySettings(aBeatmapSet),
@@ -28,6 +30,319 @@ namespace MapsetVerifierBackend.renderer
                     RenderColourSettings(aBeatmapSet),
                     Div("overview-footer")
                 );
+        }
+
+        private static string RenderTimelineComparison(BeatmapSet aBeatmapSet)
+        {
+            StringBuilder topHtml = new StringBuilder();
+            StringBuilder contentHTML = new StringBuilder();
+            StringBuilder footerHTML = new StringBuilder();
+
+            double zoomFactor = 8;
+
+            topHtml.Append(
+                Div("overview-timeline-difficulties",
+                    String.Concat(
+                    aBeatmapSet.beatmaps.Select(aBeatmap =>
+                    {
+                        return
+                            Div("overview-timeline-difficulty noselect",
+                                aBeatmap.metadataSettings.version
+                            );
+                    }))
+                )
+            );
+
+            foreach (Beatmap beatmap in aBeatmapSet.beatmaps)
+            {
+                // Mania can have multiple notes at the same time so we'll need to do that differently.
+                if (beatmap.generalSettings.mode == Beatmap.Mode.Mania)
+                    continue;
+
+                double startTimeObjects =
+                    aBeatmapSet.beatmaps.Min(aBeatmap =>
+                        aBeatmap.hitObjects.Min(anObject =>
+                            anObject.time));
+                double startTimeLines =
+                    aBeatmapSet.beatmaps.Min(aBeatmap =>
+                        aBeatmap.timingLines.Min(aLine =>
+                            aLine.offset));
+
+                double startTime =
+                    (startTimeObjects < startTimeLines ?
+                        startTimeObjects :
+                        startTimeLines)
+                    - 2000;
+                double prevObjectTime = startTime;
+
+                double sampleTime     = startTime;
+                double prevSampleTime = sampleTime;
+
+                double endTimeObjects =
+                    aBeatmapSet.beatmaps.Max(aBeatmap =>
+                        aBeatmap.hitObjects.Last()?.GetEndTime() ?? 0);
+                double endTimeLines =
+                    aBeatmapSet.beatmaps.Min(aBeatmap =>
+                        aBeatmap.timingLines.Last()?.offset ?? 0);
+
+                double endTime =
+                    (endTimeObjects < endTimeLines ?
+                        endTimeObjects :
+                        endTimeLines)
+                    + 2000;
+
+                contentHTML.Append(
+                    Div("overview-timeline locked noselect",
+                        Div("overview-timeline-right",
+                            Div("overview-timeline-right-options",
+                                DivAttr("overview-timeline-right-option overview-timeline-right-option-remove",
+                                    Tooltip("Removes the timeline.")),
+                                DivAttr("overview-timeline-right-option overview-timeline-right-option-lock",
+                                    Tooltip("Locks or unlocks scrolling. All locked timelines scroll together."))
+                            ),
+                            Div("overview-timeline-right-title",
+                                beatmap.metadataSettings.version
+                            )
+                        ),
+                        Div("overview-timeline-ticks",
+                            String.Concat(
+                            beatmap.timingLines.OfType<UninheritedLine>().Select(aLine =>
+                            {
+                                UninheritedLine nextLine = beatmap.GetNextTimingLine<UninheritedLine>(aLine.offset);
+                                double nextSwap = nextLine?.offset ?? endTime;
+
+                                StringBuilder tickDivs = new StringBuilder();
+
+                                // To get precision down to both 1/16th and 1/12th of a beat we need to sample...
+                                // 16 = 2^4, 12 = 2^2*3, 2^4*3 = 48 times per beat.
+                                int samplesPerBeat = 48;
+                                for (int i = 0; i < (nextSwap - aLine.offset) / aLine.msPerBeat * samplesPerBeat; ++i)
+                                {
+                                    // Add the practical unsnap to avoid things getting unsnapped the further into the map you go.
+                                    sampleTime =
+                                        aLine.offset + i * aLine.msPerBeat / samplesPerBeat +
+                                        beatmap.GetPracticalUnsnap(aLine.offset + i * aLine.msPerBeat / samplesPerBeat);
+
+                                    bool hasEdge =
+                                        beatmap.GetHitObject(sampleTime)?.GetEdgeTimes().Any(anEdgeTime =>
+                                            Math.Abs(anEdgeTime - sampleTime) < 2) ?? false;
+
+                                    if (i % (samplesPerBeat / 4) == 0 ||
+                                        hasEdge && (
+                                            i % (samplesPerBeat / 12) == 0 ||
+                                            i % (samplesPerBeat / 16) == 0))
+                                    {
+                                        tickDivs.Append(
+                                            DivAttr("overview-timeline-tick",
+                                                " style=\"margin-left:" + ((sampleTime - prevSampleTime) / zoomFactor) + "px\"",
+                                                Div("overview-timeline-ticks-base " + (hasEdge ? " hasobject " : "") + (
+                                                    i % (samplesPerBeat * 4)  == 0 ? "overview-timeline-ticks-largewhite" :
+                                                    i % (samplesPerBeat * 1)  == 0 ? "overview-timeline-ticks-white" :
+                                                    i % (samplesPerBeat / 2)  == 0 ? "overview-timeline-ticks-red" :
+                                                    i % (samplesPerBeat / 3)  == 0 ? "overview-timeline-ticks-magenta" :
+                                                    i % (samplesPerBeat / 4)  == 0 ? "overview-timeline-ticks-blue" :
+                                                    i % (samplesPerBeat / 6)  == 0 ? "overview-timeline-ticks-purple" :
+                                                    i % (samplesPerBeat / 8)  == 0 ? "overview-timeline-ticks-yellow" :
+                                                    i % (samplesPerBeat / 12) == 0 ? "overview-timeline-ticks-gray" :
+                                                    i % (samplesPerBeat / 16) == 0 ? "overview-timeline-ticks-gray" :
+                                                                                     "overview-timeline-ticks-unsnapped") // these last ones shouldn't appear
+                                                )
+                                            ));
+
+                                        prevSampleTime = sampleTime;
+                                    }
+                                }
+
+                                return tickDivs.ToString();
+                            }))),
+                        String.Concat(
+                        beatmap.hitObjects.Select(aHitObject =>
+                        {
+                            double prevTime = startTime;
+                            startTime = aHitObject.time;
+
+                            if (aHitObject is Circle circle)
+                                return
+                                    DivAttr("overview-timeline-object",
+                                        " style=\"margin-left:" + ((circle.time - prevTime) / zoomFactor) + "px;\"",
+                                        DivAttr("overview-timeline-circle",
+                                            DataAttr("timestamp", Timestamp.Get(circle.time)) +
+                                            " style=\"" +
+                                                RenderHitObjectBackgroundStyle(circle, beatmap) +
+                                                RenderHitObjectSizeStyle(circle, beatmap) +
+                                            "\"")
+                                    );
+                            else if (aHitObject is Slider slider)
+                            {
+                                // Big drumrolls need additional length due to the increased radius.
+                                // In taiko regular notes are smaller so it needs a reduced radius otherwise.
+                                int addedWidth =
+                                    beatmap.generalSettings.mode == Beatmap.Mode.Taiko ?
+                                        slider.HasHitSound(HitObject.HitSound.Finish) ?
+                                            32 :
+                                            22 :
+                                        23;
+                                return
+                                    DivAttr("overview-timeline-object",
+                                        DataAttr("timestamp", Timestamp.Get(slider.time)) +
+                                        " style=\"margin-left:" + ((slider.time - prevTime) / zoomFactor) + "px;\"",
+                                        String.Concat(
+                                        slider.GetEdgeTimes().Select((anEdgeTime, anIndex) =>
+                                        {
+                                            return
+                                                DivAttr("overview-timeline-object edge",
+                                                    "style=\"margin-left:" + ((anEdgeTime - slider.time) / zoomFactor) + "px;\"",
+                                                    DivAttr("overview-timeline-edge" +
+                                                        (anIndex > 0 && anIndex < slider.edgeAmount ?
+                                                            " overview-timeline-edge-reverse" : ""),
+                                                        " style=\"" +
+                                                            RenderHitObjectSizeStyle(slider, beatmap) +
+                                                        "\"")
+                                                );
+                                        })),
+                                        DivAttr("overview-timeline-path",
+                                            " style=\"" +
+                                                "width:" + ((slider.endTime - slider.time) / zoomFactor) + "px;" +
+                                                "padding-right:" + addedWidth + "px;" +
+                                                RenderHitObjectBackgroundStyle(slider, beatmap) +
+                                                RenderHitObjectSizeStyle(slider, beatmap, true) + "\"")
+                                    );
+                            }
+                            else if (aHitObject is Spinner spinner)
+                            {
+                                int addedWidth = beatmap.generalSettings.mode == Beatmap.Mode.Taiko ? 22 : 23;
+                                return
+                                    DivAttr("overview-timeline-object",
+                                        DataAttr("timestamp", Timestamp.Get(spinner.time)) +
+                                        " style=\"margin-left:" + ((spinner.time - prevTime) / zoomFactor) + "px;\"",
+                                        Div("overview-timeline-object edge",
+                                            Div("overview-timeline-edge")
+                                        ),
+                                        DivAttr("overview-timeline-object edge",
+                                            " style=\"margin-left:" + ((spinner.endTime - spinner.time) / zoomFactor) + "px;\"",
+                                            Div("overview-timeline-edge")
+                                        ),
+                                        DivAttr("overview-timeline-path",
+                                            " style=\"" +
+                                                "width:" + ((spinner.endTime - spinner.time) / zoomFactor) + "px;" +
+                                                "padding-right:" + addedWidth + "px;\"")
+                                    );
+                            }
+
+                            return
+                                DivAttr("overview-timeline-object",
+                                    " style=\"margin-left:" + ((aHitObject.time - prevTime) / zoomFactor) + "px;\""
+                                );
+                        }))
+                    )
+                );
+            }
+
+            footerHTML.Append(
+                Div("overview-timeline-slider") +
+                Div("overview-timeline-buttons",
+                    DivAttr("overview-timeline-button plus-icon",
+                        Tooltip("Zooms in timelines.")
+                    ),
+                    DivAttr("overview-timeline-button minus-icon",
+                        Tooltip("Zooms out timelines.")
+                    ),
+                    Div("overview-timeline-buttons-zoomamount",
+                        "1×"
+                    )
+                ));
+
+            return
+                RenderContainer("Timeline Comparison (Beta)",
+                    Div("overview-timeline-top",
+                        Div("overview-timeline-hints",
+                            Div("overview-timeline-hint",
+                                "Move timeline: Click & drag"
+                            ),
+                            Div("overview-timeline-hint",
+                                "Speed: Shift / Ctrl"
+                            ),
+                            Div("overview-timeline-hint",
+                                "Timestamp: Alt + Click"
+                            )
+                        ),
+                        topHtml.ToString()
+                    ),
+                    Div("overview-timeline-content",
+                        contentHTML.ToString()
+                    ),
+                    Div("overview-timeline-footer",
+                        footerHTML.ToString()
+                    )
+                ); ;
+        }
+
+        private static string RenderHitObjectBackgroundStyle(HitObject aHitObject, Beatmap aBeatmap)
+        {
+            if (aBeatmap.generalSettings.mode == Beatmap.Mode.Taiko)
+            {
+                // drumroll
+                if (aHitObject is Slider)
+                    return "background-color:rgba(252,191,31,0.5);";
+                // kat
+                if (aHitObject.HasHitSound(HitObject.HitSound.Clap) || aHitObject.HasHitSound(HitObject.HitSound.Whistle))
+                    return "background-color:rgba(68,141,171,0.5);";
+                // don
+                return "background-color:rgba(235,69,44,0.5);";
+            }
+
+            int colourIndex = aBeatmap.GetComboColourIndex(aHitObject.time);
+            if(aBeatmap.colourSettings.combos.Count() > colourIndex)
+                return
+                "background-color:rgba(" +
+                    aBeatmap.colourSettings.combos[colourIndex].X + "," +
+                    aBeatmap.colourSettings.combos[colourIndex].Y + "," +
+                    aBeatmap.colourSettings.combos[colourIndex].Z + ", 0.5);";
+            else
+                // Should no custom combo colours exist, objects will simply be gray.
+                return
+                "background-color:rgba(125,125,125, 0.5);";
+        }
+
+        /*private static string RenderHitObjectBorderStyle(HitObject aHitObject, Beatmap aBeatmap)
+        {
+            if (aBeatmap.generalSettings.mode == Beatmap.Mode.Taiko)
+            {
+                // Hit sounds are already covered by the background style.
+                return "";
+            }
+
+            int colourIndex = aBeatmap.GetComboColourIndex(aHitObject.time);
+            return
+                "border-top:1px solid rgba(" +
+                    aBeatmap.colourSettings.combos[colourIndex].X + "," +
+                    aBeatmap.colourSettings.combos[colourIndex].Y + "," +
+                    aBeatmap.colourSettings.combos[colourIndex].Z + ", 0.125);";
+        }*/
+
+        private static string RenderHitObjectSizeStyle(HitObject aHitObject, Beatmap aBeatmap, bool aIsSliderPath = false)
+        {
+            if (aBeatmap.generalSettings.mode == Beatmap.Mode.Taiko)
+            {
+                if(aHitObject.HasHitSound(HitObject.HitSound.Finish))
+                    // big don/kat
+                    return
+                        "height:30px;" +
+                        (aIsSliderPath ?
+                            "border-radius:15px;" :
+                            "width:30px;") +
+                        "margin-left:-15.5px;";
+
+                return
+                    "height:20px;" +
+                    (aIsSliderPath ?
+                        "border-radius:10px;" :
+                        "width:20px;") +
+                    "margin-left:-10.5px;" +
+                    "margin-bottom:-2px;";
+            }
+
+            return "";
         }
 
         private static string RenderMetadata(BeatmapSet aBeatmapSet)
