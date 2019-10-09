@@ -68,13 +68,7 @@ namespace MapsetVerifierBackend.renderer
                         anIssue.InterpretationPairs.Any(aPair => aPair.Key == "difficulty" && aPair.Value == (int)difficulty)))
                     difficulties.Add(difficulty);
 
-            if (difficulties.Count == Enum.GetValues(typeof(Beatmap.Difficulty)).Length)
-                return "";
-
-            return
-                DataAttr("condition",
-                    "difficulty=" + String.Join(",", difficulties.Select(aDifficulty => (int)aDifficulty))
-                );
+            return DifficultiesDataAttr(difficulties.ToArray());
         }
 
         /// <summary> Combines all difficulties into a condition attribute (data-condition="difficulty=1,2,3"), which is then returned. </summary>
