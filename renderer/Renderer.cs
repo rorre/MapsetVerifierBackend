@@ -24,11 +24,11 @@ namespace MapsetVerifierBackend.renderer
             return DivAttr(aClass, "", aContents);
         }
 
-        /// <summary> Surrounds the content with an a tag using the given reference.
+        /// <summary> Surrounds the content (or reference if none exists) with an a tag using the given reference.
         /// Does not need to target _blank, as this is done client-side. </summary>
-        protected static string Link(string aRef, object aContent)
+        protected static string Link(string aRef, object aContent = null)
         {
-            return "<a href=\"" + aRef + "\">" + aContent + "</a>";
+            return "<a href=\"" + aRef + "\">" + (aContent ?? aRef) + "</a>";
         }
 
         /// <summary> Creates a link to the given username with the same username as content. </summary>
