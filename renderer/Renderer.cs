@@ -55,6 +55,8 @@ namespace MapsetVerifierBackend.renderer
             return DataAttr("tooltip", aContent);
         }
 
+        /// <summary> Combines all difficulties this issue applies to into a condition attribute
+        /// (data-condition="difficulty=1,2,3"), which is then returned. </summary>
         protected static string DifficultiesDataAttr(Issue anIssue)
         {
             BeatmapCheckMetadata metadata = anIssue.CheckOrigin.GetMetadata() as BeatmapCheckMetadata;
@@ -75,8 +77,10 @@ namespace MapsetVerifierBackend.renderer
                 );
         }
 
+        /// <summary> Combines all difficulties into a condition attribute (data-condition="difficulty=1,2,3"), which is then returned. </summary>
         protected static string DifficultiesDataAttr(Beatmap.Difficulty[] aDifficulties)
         {
+            // With the condition being any difficulty, we might as well not have a condition at all.
             if (aDifficulties.Count() == Enum.GetValues(typeof(Beatmap.Difficulty)).Length)
                 return "";
 
@@ -86,6 +90,7 @@ namespace MapsetVerifierBackend.renderer
                 );
         }
 
+        /// <summary> Combines all interpretation pairs into a condition attribute (data-condition="key=1,2,3"), which is then returned. </summary>
         protected static string InterpretDataAttr(List<KeyValuePair<string, int>> anInterpretPairs)
         {
             return

@@ -21,8 +21,6 @@ namespace MapsetVerifierBackend.server
 
         public Worker(IHubContext<SignalHub> aHub)
         {
-            // Looks messy but since we only create one connection this is fine.
-            // Other ways of obtaining a hub context are pretty complicated.
             hub = aHub;
         }
 
