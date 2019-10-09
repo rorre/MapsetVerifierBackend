@@ -71,7 +71,7 @@ namespace MapsetVerifierBackend.renderer
                                             aTemplate.GetDefaultArguments()
                                                 .Select(anArg => "<span>" + anArg + "</span>").ToArray()),
                                         Div("cause",
-                                            ApplyMarkdown(aTemplate.GetCause())
+                                            Format(aTemplate.GetCause())
                                         )
                                     )
                                 );
@@ -88,11 +88,11 @@ namespace MapsetVerifierBackend.renderer
                 {
                     string value = aSection.Value;
                     return
-                        ExtractFloatElements(ref value) +
+                        FormatRightImages(ref value) +
                         Div("title",
                             Encode(aSection.Key)
                         ) +
-                        ApplyMarkdown(value);
+                        Format(value);
                 }));
         }
     }

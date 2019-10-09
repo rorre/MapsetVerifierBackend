@@ -130,61 +130,96 @@ namespace MapsetVerifierBackend.renderer
                                                 "info";
         }
 
-        /// <summary> Wraps all timestamps in the string into proper hyperlinks. </summary>
-        protected static string FormatTimestamps(string aMessage)
+        /// <summary> Wraps all timestamps outside of html tags into proper timestamp hyperlinks. </summary>
+        protected static string FormatTimestamps(string aContent)
         {
-            if (aMessage == null)
-                return null;
-
-            string formattedMessage = aMessage;
-            Regex stampRegex = new Regex(@"\d\d:\d\d:\d\d\d( \([\d|,]+\))?");
-            foreach (string value in stampRegex.Matches(aMessage).Cast<Match>().Select(aMatch => aMatch.Value).Distinct())
-                formattedMessage = formattedMessage.Replace(value, TimestampLink(value));
-
-            return formattedMessage;
+            return
+                Regex.Replace(
+                    aContent,
+                    @"(\d\d:\d\d:\d\d\d( \([\d|,]+\))?)(?![^<]*>|[^<>]*<\/)",
+                    (evaluator) => TimestampLink(evaluator.Value));
         }
 
-        /// <summary> Returns the given string with note or image tags replaced by actual html tags. </summary>
-        protected static string ApplyMarkdown(string aValue)
+        /// <summary> Wraps all links outside of html tags into proper hyperlinks. </summary>
+        protected static string FormatLinks(string aContent)
+        {
+            return
+                Regex.Replace(
+                    aContent,
+                    @"(http(s)?:\/\/([a-zA-Z0-9]{1,6}\.)?[a-zA-Z0-9]{1,256}\.[a-zA-Z0-9]{1,6}(\/[a-zA-Z0-9\/\?=&@\+]+)?)(?![^<]*>|[^<>]*<\/)",
+                    (evaluator) => Link(evaluator.Value));
+        }
+
+        /// <summary> Replaces all pseudo note tags into proper html tags. </summary>
+        protected static string FormatNotes(string aContent)
+        {
+            return
+                aContent
+                    .Replace("<note>", "<div class=\"note\"><div class=\"note-text\">")
+                    .Replace("</note>", "</div></div>");
+        }
+
+        /// <summary> Replaces all pseudo image tags into proper html tags and moves them if needed. </summary>
+        protected static string FormatImages(string aContent)
+        {
+            string result = aContent;
+            result = FormatCenteredImages(result);
+            result = FormatRightImages(result);
+
+            return result;
+        }
+
+        /// <summary> Replaces all center-aligned pseudo image tags into proper html tags. </summary>
+        private static string FormatCenteredImages(string aContent)
         {
             Regex regex = new Regex(
-                @"<image(-(.+))?>[\ (\r\n|\r|\n)]+([A-Za-z0-9\/:\.]+(\.jpg|\.png))[\ (\r\n|\r|\n)]+(.*?)[\ (\r\n|\r|\n)]+<\/image>",
+                @"<image>[\ (\r\n|\r|\n)]+([A-Za-z0-9\/:\.]+(\.jpg|\.png))[\ (\r\n|\r|\n)]+(.*?)[\ (\r\n|\r|\n)]+<\/image>",
                 RegexOptions.Singleline);
 
-            string result = aValue.Replace("<note>", "<div class=\"note\"><div class=\"note-text\">").Replace("</note>", "</div></div>");
-            result = ExtractFloatElements(ref result) + result;
-
+            string result = aContent;
             foreach (Match match in regex.Matches(result))
             {
-                string alignment = match.Groups[2]?.Value != "" ? match.Groups[2]?.Value : "center";
-                string src       = match.Groups[3].Value;
-                string text      = match.Groups[5].Value;
-                
+                string src = match.Groups[1].Value;
+                string text = match.Groups[3].Value;
+
                 result = regex.Replace(result,
-                    "<div class=\"image image-" + alignment + "\" data-text=\"" + Encode(text) + "\"><img src=\"" + src + "\"></img></div>", 1);
+                    "<div class=\"image image-center\" data-text=\"" + Encode(text) + "\"><img src=\"" + src + "\"></img></div>", 1);
             }
 
             return result;
         }
 
-        /// <summary> Removes any floating elements (e.g. right-aligned images) from the input and returns them. </summary>
-        protected static string ExtractFloatElements(ref string aValue)
+        /// <summary> Replaces all right-aligned pseudo image tags into proper html tags and prepends them to the content. </summary>
+        private static string FormatRightImages(string aContent)
         {
             Regex regex = new Regex(
                 @"<image-right>[\ (\r\n|\r|\n)]+([A-Za-z0-9\/:\.]+(\.jpg|\.png))[\ (\r\n|\r|\n)]+(.*?)[\ (\r\n|\r|\n)]+<\/image>",
                 RegexOptions.Singleline);
 
-            StringBuilder result = new StringBuilder();
-            foreach (Match match in regex.Matches(aValue))
+            string result = aContent;
+            StringBuilder extractedStr = new StringBuilder();
+            foreach (Match match in regex.Matches(result))
             {
-                string src  = match.Groups[1].Value;
+                string src = match.Groups[1].Value;
                 string text = match.Groups[3].Value;
-                
-                result.Append("<div class=\"image image-right\" data-text=\"" + Encode(text) + "\"><img src=\"" + src + "\"></img></div>");
-                aValue = regex.Replace(aValue, "", 1);
+
+                extractedStr.Append("<div class=\"image image-right\" data-text=\"" + Encode(text) + "\"><img src=\"" + src + "\"></img></div>");
+                result = regex.Replace(result, "", 1);
             }
 
-            return result.ToString();
+            return extractedStr.ToString() + result;
+        }
+
+        /// <summary> Applies all formatting (links, timestamps, notes, images) to the given string. </summary>
+        protected static string Format(string aContent)
+        {
+            string result = aContent;
+            result = FormatLinks(result);
+            result = FormatTimestamps(result);
+            result = FormatNotes(result);
+            result = FormatImages(result);
+
+            return result;
         }
     }
 }
