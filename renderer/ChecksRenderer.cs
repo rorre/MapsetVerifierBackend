@@ -123,26 +123,26 @@ namespace MapsetVerifierBackend.renderer
                         .Where(aCheck => aGeneral == aCheck is GeneralCheck)
                         .GroupBy(aCheck => aCheck.GetMetadata().Category)
                         .Select(aGroup =>
-                    {
-                        string category = aGroup.Key;
-                        IEnumerable<Issue> issues = aBeatmapIssues.Where(anIssue => anIssue.CheckOrigin.GetMetadata().Category == category);
+                        {
+                            string category = aGroup.Key;
+                            IEnumerable<Issue> issues = aBeatmapIssues.Where(anIssue => anIssue.CheckOrigin.GetMetadata().Category == category);
 
-                        return
-                            DivAttr("card",
-                                DataAttr("difficulty", aVersion),
-                                Div("card-box shadow noselect",
-                                    Div("large-icon " + GetIcon(issues) + "-icon"),
-                                    Div("card-title",
-                                        Encode(category)
+                            return
+                                DivAttr("card",
+                                    DataAttr("difficulty", aVersion),
+                                    Div("card-box shadow noselect",
+                                        Div("large-icon " + GetIcon(issues) + "-icon"),
+                                        Div("card-title",
+                                            Encode(category)
+                                        )
+                                    ),
+                                    Div("card-details-container",
+                                        Div("card-details",
+                                            RenderBeatmapIssues(issues, category, aGeneral)
+                                        )
                                     )
-                                ),
-                                Div("card-details-container",
-                                    Div("card-details",
-                                        RenderBeatmapIssues(issues, category, aGeneral)
-                                    )
-                                )
-                            );
-                    }).ToArray()
+                                );
+                        }).ToArray()
                 );
         }
 
@@ -155,34 +155,34 @@ namespace MapsetVerifierBackend.renderer
                         aCheck.GetMetadata().Category == aCategory &&
                         aGeneral == aCheck is GeneralCheck)
                     .Select(aCheck =>
-                {
-                    IEnumerable<Issue> issues = aCategoryIssues.Where(anIssue => anIssue.CheckOrigin == aCheck).ToList();
-                    BeatmapCheckMetadata metadata = aCheck.GetMetadata() as BeatmapCheckMetadata;
+                    {
+                        BeatmapCheckMetadata metadata = aCheck.GetMetadata() as BeatmapCheckMetadata;
+                        IEnumerable<Issue> issues = aCategoryIssues.Where(anIssue => anIssue.CheckOrigin == aCheck);
                     
-                    string message = aCheck.GetMetadata().Message;
+                        string message = aCheck.GetMetadata().Message;
 
-                    return
-                        DivAttr("card-detail",
-                            (metadata != null ? DifficultiesDataAttr(metadata.Difficulties) : "") +
-                            " data-check=\"" + Encode(message) + "\"",
-                            Div("card-detail-icon " + GetIcon(issues) + "-icon"),
-                            (issues.Any() ?
-                            Div("",
+                        return
+                            DivAttr("card-detail",
+                                (metadata != null ? DifficultiesDataAttr(metadata.Difficulties) : "") +
+                                " data-check=\"" + Encode(message) + "\"",
+                                Div("card-detail-icon " + GetIcon(issues) + "-icon"),
+                                (issues.Any() ?
+                                Div("",
+                                    Div("card-detail-text",
+                                        message
+                                    ),
+                                    DivAttr("vertical-arrow card-detail-toggle detail-shortcut",
+                                        Tooltip("Toggle details")
+                                    )
+                                ) :
                                 Div("card-detail-text",
                                     message
-                                ),
-                                DivAttr("vertical-arrow card-detail-toggle detail-shortcut",
-                                    Tooltip("Toggle details")
+                                )),
+                                DivAttr("doc-shortcut detail-shortcut",
+                                    Tooltip("Show documentation")
                                 )
-                            ) :
-                            Div("card-detail-text",
-                                message
-                            )),
-                            DivAttr("doc-shortcut detail-shortcut",
-                                Tooltip("Show documentation")
-                            )
-                        ) +
-                        RenderBeatmapDetails(issues);
+                            ) +
+                            RenderBeatmapDetails(issues);
                 }));
         }
 
