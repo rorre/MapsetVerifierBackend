@@ -189,7 +189,7 @@ namespace MapsetVerifierBackend.renderer
         }
 
         /// <summary> Replaces all right-aligned pseudo image tags into proper html tags and prepends them to the content. </summary>
-        private static string FormatRightImages(string aContent)
+        protected static string FormatRightImages(string aContent)
         {
             Regex regex = new Regex(
                 @"<image-right>[\ (\r\n|\r|\n)]+([A-Za-z0-9\/:\.]+(\.jpg|\.png))[\ (\r\n|\r|\n)]+(.*?)[\ (\r\n|\r|\n)]+<\/image>",

@@ -88,7 +88,6 @@ namespace MapsetVerifierBackend.renderer
                 {
                     string value = aSection.Value;
                     return
-                        FormatRightImages(ref value) +
                         Div("title",
                             Encode(aSection.Key)
                         ) +
