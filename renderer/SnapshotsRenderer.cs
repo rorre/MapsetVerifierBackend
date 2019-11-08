@@ -85,6 +85,12 @@ namespace MapsetVerifierBackend.renderer
         private static string RenderBeatmapSnapshots(BeatmapSet aBeatmapSet)
         {
             Beatmap refBeatmap = aBeatmapSet.beatmaps[0];
+            if (refBeatmap.metadataSettings.beatmapSetId == null)
+                return
+                    Div("paste-separator") +
+                    Div("unsubmitted-snapshot-error",
+                        "Beatmapset ID is -1. This makes the map ambigious with any other " +
+                        "unsubmitted map. Submit the map before using this feature.");
 
             // Just need the beatmapset id to know in which snapshot folder to look for the files.
             IEnumerable<Snapshotter.Snapshot> refSnapshots =
