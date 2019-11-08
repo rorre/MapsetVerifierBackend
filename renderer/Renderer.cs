@@ -158,6 +158,15 @@ namespace MapsetVerifierBackend.renderer
                     .Replace("</note>", "</div></div>");
         }
 
+        protected static string FormatCode(string aContent)
+        {
+            return
+                Regex.Replace(
+                    aContent,
+                    @"`.*?`",
+                    (evaluator) => Div("code", evaluator.Value.Replace("`", "")));
+        }
+
         /// <summary> Replaces all pseudo image tags into proper html tags and moves them if needed. </summary>
         protected static string FormatImages(string aContent)
         {
@@ -209,10 +218,11 @@ namespace MapsetVerifierBackend.renderer
             return extractedStr.ToString() + result;
         }
 
-        /// <summary> Applies all formatting (links, timestamps, notes, images) to the given string. </summary>
+        /// <summary> Applies all formatting (code, links, timestamps, notes, images) to the given string. </summary>
         protected static string Format(string aContent)
         {
             string result = aContent;
+            result = FormatCode(result);
             result = FormatLinks(result);
             result = FormatTimestamps(result);
             result = FormatNotes(result);
