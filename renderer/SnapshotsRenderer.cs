@@ -255,13 +255,13 @@ namespace MapsetVerifierBackend.renderer
                aBeatmapSet.beatmaps.SelectMany(aBeatmap =>
                    Snapshotter.GetSnapshots(aBeatmap)
                        .Select(aSnapshot => aSnapshot.creationTime))
-                   .OrderBy(aDate => aDate).Distinct().ToList();
+                   .ToList();
 
             snapshotDates.AddRange(Snapshotter.GetSnapshots(
                 aBeatmapSet.beatmaps.First().metadataSettings.beatmapSetId.ToString(), "files")
                     .Select(aSnapshot => aSnapshot.creationTime));
 
-            snapshotDates = snapshotDates.Distinct().ToList();
+            snapshotDates = snapshotDates.Distinct().OrderBy(aDate => aDate).ToList();
         }
 
         private static string GetIcon(DiffInstance aDiff)
