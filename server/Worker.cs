@@ -9,6 +9,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -129,7 +130,10 @@ namespace MapsetVerifierBackend.server
         {
             try
             {
-                Snapshotter.SnapshotBeatmapSet(State.LoadedBeatmapSet);
+                // Beatmapset null (-1) would become ambigious with any other unsubmitted map.
+                if (State.LoadedBeatmapSet.beatmaps.FirstOrDefault()?.metadataSettings.beatmapSetId != null)
+                    Snapshotter.SnapshotBeatmapSet(State.LoadedBeatmapSet);
+
                 if (State.LoadedBeatmapSetPath != aBeatmapSetPath)
                     return;
 
