@@ -23,13 +23,13 @@
 
   <ItemGroup>
     <Reference Include="MapsetParser">
-      <HintPath>..\MapsetParser\bin\Debug\netcoreapp2.0\MapsetParser.dll</HintPath>
+      <HintPath>..\MapsetParser\bin\Debug\netcoreapp3.1\MapsetParser.dll</HintPath>
     </Reference>
     <Reference Include="MapsetSnapshotter">
-      <HintPath>..\MapsetSnapshotter\bin\Debug\netcoreapp2.0\MapsetSnapshotter.dll</HintPath>
+      <HintPath>..\MapsetSnapshotter\bin\Debug\netcoreapp3.1\MapsetSnapshotter.dll</HintPath>
     </Reference>
     <Reference Include="MapsetVerifierFramework">
-      <HintPath>..\MapsetVerifierFramework\bin\Debug\netcoreapp2.0\MapsetVerifierFramework.dll</HintPath>
+      <HintPath>..\MapsetVerifierFramework\bin\Debug\netcoreapp3.1\MapsetVerifierFramework.dll</HintPath>
     </Reference>
   </ItemGroup>
 
