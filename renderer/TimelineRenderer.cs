@@ -185,16 +185,16 @@ namespace MapsetVerifierBackend.renderer
                                 DivAttr("overview-timeline-tick",
                                     " style=\"margin-left:" + ((sampleTime - prevSampleTime) / ZOOM_FACTOR) + "px\"",
                                     Div("overview-timeline-ticks-base " + (hasEdge ? " hasobject " : "") + (
-                                        i % (samplesPerBeat * 4) == 0 ? "overview-timeline-ticks-largewhite" :
-                                        i % (samplesPerBeat * 1) == 0 ? "overview-timeline-ticks-white" :
-                                        i % (samplesPerBeat / 2) == 0 ? "overview-timeline-ticks-red" :
-                                        i % (samplesPerBeat / 3) == 0 ? "overview-timeline-ticks-magenta" :
-                                        i % (samplesPerBeat / 4) == 0 ? "overview-timeline-ticks-blue" :
-                                        i % (samplesPerBeat / 6) == 0 ? "overview-timeline-ticks-purple" :
-                                        i % (samplesPerBeat / 8) == 0 ? "overview-timeline-ticks-yellow" :
-                                        i % (samplesPerBeat / 12) == 0 ? "overview-timeline-ticks-gray" :
-                                        i % (samplesPerBeat / 16) == 0 ? "overview-timeline-ticks-gray" :
-                                                                            "overview-timeline-ticks-unsnapped") // these last ones shouldn't appear
+                                        i % (samplesPerBeat * aLine.meter) == 0 ? "overview-timeline-ticks-largewhite" :
+                                        i % (samplesPerBeat * 1) == 0 ?           "overview-timeline-ticks-white" :
+                                        i % (samplesPerBeat / 2) == 0 ?           "overview-timeline-ticks-red" :
+                                        i % (samplesPerBeat / 3) == 0 ?           "overview-timeline-ticks-magenta" :
+                                        i % (samplesPerBeat / 4) == 0 ?           "overview-timeline-ticks-blue" :
+                                        i % (samplesPerBeat / 6) == 0 ?           "overview-timeline-ticks-purple" :
+                                        i % (samplesPerBeat / 8) == 0 ?           "overview-timeline-ticks-yellow" :
+                                        i % (samplesPerBeat / 12) == 0 ?          "overview-timeline-ticks-gray" :
+                                        i % (samplesPerBeat / 16) == 0 ?          "overview-timeline-ticks-gray" :
+                                                                                  "overview-timeline-ticks-unsnapped") // these last ones shouldn't appear
                                     )
                                 ));
 
