@@ -249,6 +249,21 @@ namespace MapsetVerifierBackend.renderer
                         else
                             return "N/A";
                     }),
+                    RenderBeatmapContent(aBeatmapSet, "Column Object Count", aBeatmap =>
+                    {
+                        // Columns only exist in mania.
+                        if (aBeatmap.generalSettings.mode == Beatmap.Mode.Mania)
+                        {
+                            int column1 = aBeatmap.hitObjects.Where(hitObject => hitObject.Position.X == 64).Count();
+                            int column2 = aBeatmap.hitObjects.Where(hitObject => hitObject.Position.X == 192).Count();
+                            int column3 = aBeatmap.hitObjects.Where(hitObject => hitObject.Position.X == 320).Count();
+                            int column4 = aBeatmap.hitObjects.Where(hitObject => hitObject.Position.X == 448).Count();
+
+                            return $"{column1}|{column2}|{column3}|{column4}";
+                        }
+                        else
+                            return "N/A";
+                    }),
                     RenderBeatmapContent(aBeatmapSet, "New Combo Count", aBeatmap =>
                          aBeatmap.hitObjects.Where(anObject => anObject.type.HasFlag(HitObject.Type.NewCombo)).Count().ToString(CultureInfo.InvariantCulture)),
                     RenderBeatmapContent(aBeatmapSet, "Break Count", aBeatmap =>
