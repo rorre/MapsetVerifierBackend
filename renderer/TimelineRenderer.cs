@@ -91,7 +91,9 @@ namespace MapsetVerifierBackend.renderer
                         Div("overview-timeline-ticks",
                             RenderTicks(beatmap, startTime, endTime)
                         ),
-                        RenderObjects(beatmap, startTime)
+                        Div("overview-timeline-objects",
+                            RenderObjects(beatmap, startTime)
+                        )
                     )
                 );
             }
@@ -226,7 +228,8 @@ namespace MapsetVerifierBackend.renderer
                                         " style=\"" +
                                             RenderHitObjectBackgroundStyle(circle, aBeatmap) +
                                             RenderHitObjectSizeStyle(circle, aBeatmap) +
-                                        "\"")
+                                        "\"",
+                                        RenderHitObjectHitSound(circle, aBeatmap))
                                 );
                         else if (aHitObject is Slider slider)
                         {
@@ -253,7 +256,8 @@ namespace MapsetVerifierBackend.renderer
                                                         " overview-timeline-edge-reverse" : ""),
                                                     " style=\"" +
                                                         RenderHitObjectSizeStyle(slider, aBeatmap) +
-                                                    "\"")
+                                                    "\"",
+                                                    RenderHitObjectHitSound(slider, aBeatmap, anIndex))
                                             );
                                     })),
                                     DivAttr("overview-timeline-path",
@@ -272,11 +276,15 @@ namespace MapsetVerifierBackend.renderer
                                     DataAttr("timestamp", Timestamp.Get(spinner.time)) +
                                     " style=\"margin-left:" + ((spinner.time - prevTime) / ZOOM_FACTOR) + "px;\"",
                                     Div("overview-timeline-object edge",
-                                        Div("overview-timeline-edge")
+                                        Div("overview-timeline-edge",
+                                            RenderHitObjectHitSound(spinner, aBeatmap)
+                                        )
                                     ),
                                     DivAttr("overview-timeline-object edge",
                                         " style=\"margin-left:" + ((spinner.endTime - spinner.time) / ZOOM_FACTOR) + "px;\"",
-                                        Div("overview-timeline-edge")
+                                        Div("overview-timeline-edge",
+                                            RenderHitObjectHitSound(spinner, aBeatmap, 1)
+                                        )
                                     ),
                                     DivAttr("overview-timeline-path",
                                         " style=\"" +
@@ -339,6 +347,33 @@ namespace MapsetVerifierBackend.renderer
                         "width:20px;") +
                     "margin-left:-10.5px;" +
                     "margin-bottom:-2px;";
+            }
+
+            return "";
+        }
+
+        private static string RenderHitObjectHitSound(HitObject hitObject, Beatmap beatmap, int edgeIndex = 0)
+        {
+            if (beatmap.generalSettings.mode == Beatmap.Mode.Taiko)
+                // Taiko modifies gameplay through hit sounds, and this gameplay effect is visible in the timeline already.
+                return "";
+
+            HitObject.HitSound? hitSound = null;
+            if (edgeIndex == 0)
+                hitSound = hitObject.GetStartHitSound();
+            else if (hitObject is Slider slider && slider.reverseHitSounds.Count > edgeIndex)
+                hitSound = slider.reverseHitSounds[edgeIndex];
+            else
+                hitSound = hitObject.GetEndHitSound();
+
+            List<string> styles = new List<string>() { "overview-timeline-hs" };
+            if (hitSound is HitObject.HitSound hs)
+            {
+                if (hs.HasFlag(HitObject.HitSound.Whistle)) styles.Add("overview-timeline-hs-whistle");
+                if (hs.HasFlag(HitObject.HitSound.Clap))    styles.Add("overview-timeline-hs-clap");
+                if (hs.HasFlag(HitObject.HitSound.Finish))  styles.Add("overview-timeline-hs-finish");
+
+                return Div(string.Join(" ", styles));
             }
 
             return "";
