@@ -17,7 +17,7 @@ namespace MapsetVerifierBackend
             // that decimals are indicated by a period and not a comma.
             CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
 
-            string appdataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            string appdataPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
             Checker.RelativeDLLDirectory  = Path.Combine(appdataPath, "Mapset Verifier Externals", "checks");
             Snapshotter.RelativeDirectory = Path.Combine(appdataPath, "Mapset Verifier Externals");
 
