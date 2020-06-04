@@ -24,6 +24,7 @@ namespace MapsetVerifierBackend.renderer
             return
                 RenderContainer("Timeline Comparison (Prototype)",
                     Div("overview-timeline-top",
+                        // Control hints.
                         Div("overview-timeline-hints",
                             Div("overview-timeline-hint",
                                 "Move timeline: Click & drag"
@@ -33,6 +34,21 @@ namespace MapsetVerifierBackend.renderer
                             ),
                             Div("overview-timeline-hint",
                                 "Timestamp: Alt + Click"
+                            )
+                        ),
+                        // Hit sound coloring hints.
+                        Div("overview-timeline-hints",
+                            Div("overview-timeline-hint overview-timeline-hs",
+                                "Colored lines: "
+                            ),
+                            Div("overview-timeline-hint overview-timeline-hs",
+                                "Red - Clap"
+                            ),
+                            Div("overview-timeline-hint overview-timeline-hs",
+                                "Blue - Whistle"
+                            ),
+                            Div("overview-timeline-hint overview-timeline-hs",
+                                "Green - Finish"
                             )
                         ),
                         RenderTop(aBeatmapSet)
