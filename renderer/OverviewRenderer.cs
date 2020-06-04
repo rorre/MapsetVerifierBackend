@@ -223,9 +223,9 @@ namespace MapsetVerifierBackend.renderer
                         else
                             return "N/A";
                     }),
-                    RenderBeatmapContent(aBeatmapSet, "Circle Count", aBeatmap =>
+                    RenderBeatmapContent(aBeatmapSet, "Circles", aBeatmap =>
                         aBeatmap.hitObjects.OfType<Circle>().Count().ToString(CultureInfo.InvariantCulture)),
-                    RenderBeatmapContent(aBeatmapSet, "Slider Count", aBeatmap =>
+                    RenderBeatmapContent(aBeatmapSet, "Sliders", aBeatmap =>
                     {
                         // Sliders don't exist in mania.
                         if (aBeatmap.generalSettings.mode != Beatmap.Mode.Mania)
@@ -233,7 +233,7 @@ namespace MapsetVerifierBackend.renderer
                         else
                             return "N/A";
                     }),
-                    RenderBeatmapContent(aBeatmapSet, "Spinner Count", aBeatmap =>
+                    RenderBeatmapContent(aBeatmapSet, "Spinners", aBeatmap =>
                     {
                         // Spinners don't exist in mania.
                         if (aBeatmap.generalSettings.mode != Beatmap.Mode.Mania)
@@ -241,7 +241,7 @@ namespace MapsetVerifierBackend.renderer
                         else
                             return "N/A";
                     }),
-                    RenderBeatmapContent(aBeatmapSet, "Hold Note Count", aBeatmap =>
+                    RenderBeatmapContent(aBeatmapSet, "Hold Notes", aBeatmap =>
                     {
                         // Hold notes only exist in mania.
                         if (aBeatmap.generalSettings.mode == Beatmap.Mode.Mania)
@@ -249,7 +249,7 @@ namespace MapsetVerifierBackend.renderer
                         else
                             return "N/A";
                     }),
-                    RenderBeatmapContent(aBeatmapSet, "Column Object Count", aBeatmap =>
+                    RenderBeatmapContent(aBeatmapSet, "Objects per Column", aBeatmap =>
                     {
                         // Columns only exist in mania.
                         if (aBeatmap.generalSettings.mode == Beatmap.Mode.Mania)
@@ -264,9 +264,9 @@ namespace MapsetVerifierBackend.renderer
                         else
                             return "N/A";
                     }),
-                    RenderBeatmapContent(aBeatmapSet, "New Combo Count", aBeatmap =>
+                    RenderBeatmapContent(aBeatmapSet, "New Combos", aBeatmap =>
                          aBeatmap.hitObjects.Where(anObject => anObject.type.HasFlag(HitObject.Type.NewCombo)).Count().ToString(CultureInfo.InvariantCulture)),
-                    RenderBeatmapContent(aBeatmapSet, "Break Count", aBeatmap =>
+                    RenderBeatmapContent(aBeatmapSet, "Breaks", aBeatmap =>
                         aBeatmap.breaks.Count().ToString(CultureInfo.InvariantCulture)),
                     RenderBeatmapContent(aBeatmapSet, "Uninherited Lines", aBeatmap =>
                         aBeatmap.timingLines.OfType<UninheritedLine>().Count().ToString(CultureInfo.InvariantCulture)),
