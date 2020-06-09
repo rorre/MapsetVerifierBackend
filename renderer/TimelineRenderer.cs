@@ -374,7 +374,7 @@ namespace MapsetVerifierBackend.renderer
                 // Taiko modifies gameplay through hit sounds, and this gameplay effect is visible in the timeline already.
                 return "";
 
-            HitObject.HitSound? hitSound = null;
+            HitObject.HitSound? hitSound;
             if (edgeIndex == 0)
                 hitSound = hitObject.GetStartHitSound();
             else if (hitObject is Slider slider && slider.reverseHitSounds.Count > edgeIndex)
