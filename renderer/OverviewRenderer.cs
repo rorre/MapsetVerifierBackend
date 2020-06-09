@@ -129,7 +129,7 @@ namespace MapsetVerifierBackend.renderer
                     }),
                     RenderBeatmapContent(aBeatmapSet, "Letterbox During Breaks", aBeatmap =>
                     {
-                        if(aBeatmap.breaks.Any() || !aBeatmap.generalSettings.letterbox)
+                        if (aBeatmap.breaks.Any() || !aBeatmap.generalSettings.letterbox)
                             return aBeatmap.generalSettings.letterbox.ToString();
                         else
                             return "N/A";
