@@ -391,35 +391,47 @@ namespace MapsetVerifierBackend.renderer
                             Div("overview-float",
                                 String.Join("<br>",
                                     hsUsedCount.Select(aPair =>
-                                    {
-                                        string fullPath = Path.Combine(aBeatmapSet.songPath, aPair.Key);
+                                        Try (() =>
+                                            {
+                                                string fullPath = Path.Combine(aBeatmapSet.songPath, aPair.Key);
 
-                                        return Encode(RenderFileSize(fullPath));
-                                    })
+                                                return Encode(RenderFileSize(fullPath));
+                                            },
+                                            noteIfError: "Could not get hit sound file size"
+                                        )
+                                    )
                                 )
                             ) +
                             Div("overview-float",
                                 String.Join("<br>",
                                     hsUsedCount.Select(aPair =>
-                                    {
-                                        string fullPath = Path.Combine(aBeatmapSet.songPath, aPair.Key);
-                                        double duration = Audio.GetDuration(fullPath);
+                                        Try (() =>
+                                            {
+                                                string fullPath = Path.Combine(aBeatmapSet.songPath, aPair.Key);
+                                                double duration = Audio.GetDuration(fullPath);
 
-                                        if (duration < 0)
-                                            return "0 ms";
+                                                if (duration < 0)
+                                                    return "0 ms";
 
-                                        return $"{duration:0.##} ms";
-                                    })
+                                                return $"{duration:0.##} ms";
+                                            },
+                                            noteIfError: "Could not get hit sound duration"
+                                        )
+                                    )
                                 )
                             ) +
                             Div("overview-float",
                                 String.Join("<br>",
                                     hsUsedCount.Select(aPair =>
-                                    {
-                                        string fullPath = Path.Combine(aBeatmapSet.songPath, aPair.Key);
+                                        Try (() =>
+                                            {
+                                                string fullPath = Path.Combine(aBeatmapSet.songPath, aPair.Key);
 
-                                        return Encode(Audio.EnumToString(Audio.GetFormat(fullPath)));
-                                    })
+                                                return Encode(Audio.EnumToString(Audio.GetFormat(fullPath)));
+                                            },
+                                            noteIfError: "Could not get hit sound file path"
+                                        )
+                                    )
                                 )
                             ) +
                             Div("overview-float",
@@ -446,28 +458,29 @@ namespace MapsetVerifierBackend.renderer
                                 error = exception.Message;
                             }
 
-                            if (error != null || tagFile == null)
-                                return
-                                    Div("overview-float",
-                                        Encode(aBeatmap.backgrounds.First().path)
-                                    ) +
-                                    Div("overview-float",
-                                        Encode(RenderFileSize(fullPath))
-                                    ) +
-                                    Div("overview-float",
-                                        Encode($"(failed getting proprties; {error})")
-                                    );
-
                             return
                                 Div("overview-float",
-                                    Encode(aBeatmap.backgrounds.First().path)
+                                    Try(() =>
+                                        Encode(aBeatmap.backgrounds.First().path),
+                                        noteIfError: "Could not get background file path"
+                                    )
                                 ) +
                                 Div("overview-float",
-                                    Encode(RenderFileSize(fullPath))
+                                    Try(() =>
+                                        Encode(RenderFileSize(fullPath)),
+                                        noteIfError: "Could not get background file size"
+                                    )
                                 ) +
-                                Div("overview-float",
-                                    Encode(tagFile.Properties.PhotoWidth + " x " + tagFile.Properties.PhotoHeight)
-                                );
+                                ((error != null || tagFile == null) ?
+                                    Div("overview-float",
+                                        Try(() =>
+                                            Encode(tagFile.Properties.PhotoWidth + " x " + tagFile.Properties.PhotoHeight),
+                                            noteIfError: "Could not get background resolution"
+                                        )
+                                    ) :
+                                    Div("overview-float",
+                                        Encode($"(failed getting proprties; {error})")
+                                    ));
                         }
                         else
                             return "";
@@ -485,35 +498,37 @@ namespace MapsetVerifierBackend.renderer
                             try
                             { tagFile = new FileAbstraction(fullPath).GetTagFile(); }
                             catch (Exception exception)
-                            {
-                                error = exception.Message;
-                            }
-
-                            if (error != null || tagFile == null)
-                                return
-                                    Div("overview-float",
-                                        Encode(aBeatmap.videos.First().path)
-                                    ) +
-                                    Div("overview-float",
-                                        Encode(RenderFileSize(fullPath))
-                                    ) +
-                                    Div("overview-float",
-                                        Encode($"(failed getting proprties; {error})")
-                                    );
+                            { error = exception.Message; }
 
                             return
                                 Div("overview-float",
-                                    Encode(aBeatmap.videos.First().path)
+                                    Try(() =>
+                                        Encode(aBeatmap.videos.First().path),
+                                        noteIfError: "Could not get video file path"
+                                    )
                                 ) +
                                 Div("overview-float",
-                                    Encode(RenderFileSize(fullPath))
+                                    Try(() =>
+                                        Encode(RenderFileSize(fullPath)),
+                                        noteIfError: "Could not get video file size"
+                                    )
                                 ) +
-                                Div("overview-float",
-                                    FormatTimestamps(Encode(Timestamp.Get(tagFile.Properties.Duration.TotalMilliseconds)))
-                                ) +
-                                Div("overview-float",
-                                    Encode(tagFile.Properties.VideoWidth + " x " + tagFile.Properties.VideoHeight)
-                                );
+                                ((error != null || tagFile == null) ?
+                                    Div("overview-float",
+                                        Try(() =>
+                                            FormatTimestamps(Encode(Timestamp.Get(tagFile.Properties.Duration.TotalMilliseconds))),
+                                            noteIfError: "Could not get video duration"
+                                        )
+                                    ) +
+                                    Div("overview-float",
+                                        Try(() =>
+                                            Encode(tagFile.Properties.VideoWidth + " x " + tagFile.Properties.VideoHeight),
+                                            noteIfError: "Could not get video resolution"
+                                        )
+                                    ) :
+                                    Div("overview-float",
+                                        Encode($"(failed getting proprties; {error})")
+                                    ));
                         }
                         else
                             return "";
@@ -524,22 +539,30 @@ namespace MapsetVerifierBackend.renderer
                         if (path == null)
                             return "";
 
-                        FileInfo fileInfo = new FileInfo(path);
-                        ManagedBass.ChannelType format = Audio.GetFormat(path);
-                        double duration = Audio.GetDuration(path);
-
                         return
                             Div("overview-float",
-                                Encode(PathStatic.RelativePath(path, aBeatmap.songPath))
+                                Try(() =>
+                                    Encode(PathStatic.RelativePath(path, aBeatmap.songPath)),
+                                    noteIfError: "Could not get audio file path"
+                                )
                             ) +
                             Div("overview-float",
-                                Encode(RenderFileSize(path))
+                                Try(() =>
+                                    Encode(RenderFileSize(path)),
+                                    noteIfError: "Could not get audio file size"
+                                )
                             ) +
                             Div("overview-float",
-                                FormatTimestamps(Encode(Timestamp.Get(duration)))
+                                Try(() =>
+                                    FormatTimestamps(Encode(Timestamp.Get(Audio.GetDuration(path)))),
+                                    noteIfError: "Could not get audio duration"
+                                )
                             ) +
                             Div("overview-float",
-                                Encode(Audio.EnumToString(format))
+                                Try(() =>
+                                    Encode(Audio.EnumToString(Audio.GetFormat(path))),
+                                    noteIfError: "Could not get audio format"
+                                )
                             );
                     }, false),
                     RenderBeatmapContent(aBeatmapSet, "Audio Bitrate", aBeatmap =>
@@ -552,10 +575,10 @@ namespace MapsetVerifierBackend.renderer
 
                         return
                             Div("overview-float",
-                                (audioFile.GetLowestBitrate() == audioFile.GetHighestBitrate() ?
+                                audioFile.GetLowestBitrate() == audioFile.GetHighestBitrate() ?
                                     $"CBR, {audioFile.GetLowestBitrate() / 1000:0.##} kbps" :
                                     $"VBR, {audioFile.GetLowestBitrate() / 1000:0.##} kbps to {audioFile.GetHighestBitrate() / 1000:0.##} kbps, " +
-                                    $"average {audioFile.GetAverageBitrate() / 1000:0.##} kbps")
+                                    $"average {audioFile.GetAverageBitrate() / 1000:0.##} kbps"
                             );
                     }, false),
                     RenderField("Has .osb",
@@ -566,6 +589,18 @@ namespace MapsetVerifierBackend.renderer
                     RenderBeatmapContent(aBeatmapSet, "Song Folder Size", aBeatmap =>
                         RenderDirectorySize(aBeatmap.songPath))
                 );
+        }
+
+        private static string Try(Func<string> func, string noteIfError = "")
+        {
+            try
+            {
+                return func();
+            }
+            catch (Exception exception)
+            {
+                return $"<span style=\"color: var(--exception);\">{noteIfError}; {exception.Message}</span>";
+            }
         }
 
         private static float GetLuminosity(Vector3 aColour)
@@ -670,7 +705,16 @@ namespace MapsetVerifierBackend.renderer
         {
             Dictionary<Beatmap, string> beatmapContent = new Dictionary<Beatmap, string>();
             foreach (Beatmap beatmap in aBeatmapSet.beatmaps)
-                beatmapContent[beatmap] = aFunc(beatmap);
+            {
+                try
+                {
+                    beatmapContent[beatmap] = aFunc(beatmap);
+                }
+                catch (Exception exception)
+                {
+                    beatmapContent[beatmap] = $"<span style=\"color: var(--exception);\">{exception.Message}</span>";
+                }
+            }
 
             if(beatmapContent.Any(aPair => aPair.Value != beatmapContent.First().Value))
                 return
