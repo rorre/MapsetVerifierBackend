@@ -571,14 +571,9 @@ namespace MapsetVerifierBackend.renderer
                         if (path == null)
                             return "N/A";
 
-                        AudioFile audioFile = new AudioFile(path);
-
                         return
                             Div("overview-float",
-                                audioFile.GetLowestBitrate() == audioFile.GetHighestBitrate() ?
-                                    $"CBR, {audioFile.GetLowestBitrate() / 1000:0.##} kbps" :
-                                    $"VBR, {audioFile.GetLowestBitrate() / 1000:0.##} kbps to {audioFile.GetHighestBitrate() / 1000:0.##} kbps, " +
-                                    $"average {audioFile.GetAverageBitrate() / 1000:0.##} kbps"
+                                $"average {Math.Round(Audio.GetBitrate(path))} kbps"
                             );
                     }, false),
                     RenderField("Has .osb",
