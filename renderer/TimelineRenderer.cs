@@ -377,8 +377,8 @@ namespace MapsetVerifierBackend.renderer
             HitObject.HitSound? hitSound;
             if (edgeIndex == 0)
                 hitSound = hitObject.GetStartHitSound();
-            else if (hitObject is Slider slider && slider.reverseHitSounds.Count > edgeIndex)
-                hitSound = slider.reverseHitSounds[edgeIndex];
+            else if (hitObject is Slider slider && slider.reverseHitSounds.Count > edgeIndex - 1)
+                hitSound = slider.reverseHitSounds[edgeIndex - 1];
             else
                 hitSound = hitObject.GetEndHitSound();
 
