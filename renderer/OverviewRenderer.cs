@@ -408,7 +408,7 @@ namespace MapsetVerifierBackend.renderer
                                         Try (() =>
                                             {
                                                 string fullPath = Path.Combine(aBeatmapSet.songPath, aPair.Key);
-                                                double duration = Audio.GetDuration(fullPath);
+                                                double duration = AudioBASS.GetDuration(fullPath);
 
                                                 if (duration < 0)
                                                     return "0 ms";
@@ -427,7 +427,7 @@ namespace MapsetVerifierBackend.renderer
                                             {
                                                 string fullPath = Path.Combine(aBeatmapSet.songPath, aPair.Key);
 
-                                                return Encode(Audio.EnumToString(Audio.GetFormat(fullPath)));
+                                                return Encode(AudioBASS.EnumToString(AudioBASS.GetFormat(fullPath)));
                                             },
                                             noteIfError: "Could not get hit sound file path"
                                         )
@@ -554,13 +554,13 @@ namespace MapsetVerifierBackend.renderer
                             ) +
                             Div("overview-float",
                                 Try(() =>
-                                    FormatTimestamps(Encode(Timestamp.Get(Audio.GetDuration(path)))),
+                                    FormatTimestamps(Encode(Timestamp.Get(AudioBASS.GetDuration(path)))),
                                     noteIfError: "Could not get audio duration"
                                 )
                             ) +
                             Div("overview-float",
                                 Try(() =>
-                                    Encode(Audio.EnumToString(Audio.GetFormat(path))),
+                                    Encode(AudioBASS.EnumToString(AudioBASS.GetFormat(path))),
                                     noteIfError: "Could not get audio format"
                                 )
                             );
@@ -573,7 +573,7 @@ namespace MapsetVerifierBackend.renderer
 
                         return
                             Div("overview-float",
-                                $"average {Math.Round(Audio.GetBitrate(path))} kbps"
+                                $"average {Math.Round(AudioBASS.GetBitrate(path))} kbps"
                             );
                     }, false),
                     RenderField("Has .osb",
