@@ -22,6 +22,7 @@ namespace MapsetVerifierBackend.renderer
                     RenderBeatmapInfo(aBeatmapSet),
                     Div("paste-separator"),
                     RenderTimelineComparison(aBeatmapSet),
+                    RenderSnappings(aBeatmapSet),
                     RenderMetadata(aBeatmapSet),
                     RenderGeneralSettings(aBeatmapSet),
                     RenderDifficultySettings(aBeatmapSet),
@@ -32,9 +33,50 @@ namespace MapsetVerifierBackend.renderer
                 );
         }
 
-        private static string RenderTimelineComparison(BeatmapSet aBeatmapSet)
+        private static string RenderTimelineComparison(BeatmapSet aBeatmapSet) =>
+            TimelineRenderer.Render(aBeatmapSet);
+
+        private static string RenderSnappings(BeatmapSet aBeatmapSet)
         {
-            return TimelineRenderer.Render(aBeatmapSet);
+            var divisorStamps = new Dictionary<Beatmap, Dictionary<int, List<string>>>();
+            List<int> divisors = new List<int>() { 1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 16 };
+
+            foreach (Beatmap beatmap in aBeatmapSet.beatmaps)
+            {
+                if (divisorStamps.GetValueOrDefault(beatmap) == null)
+                    divisorStamps[beatmap] = new Dictionary<int, List<string>>();
+
+                foreach (int divisor in divisors)
+                    if (divisorStamps[beatmap].GetValueOrDefault(divisor) == null)
+                        divisorStamps[beatmap][divisor] = new List<string>();
+
+                foreach (HitObject hitObject in beatmap.hitObjects)
+                {
+                    foreach (double edgeTime in hitObject.GetEdgeTimes())
+                    {
+                        int    divisor = beatmap.GetLowestDivisor(edgeTime);
+                        string stamp   = Timestamp.Get(edgeTime) + $"({hitObject.GetPartName(edgeTime)})";
+
+                        divisorStamps[beatmap][divisor].Add(stamp);
+                    }
+                }
+            }
+
+            return
+                RenderContainer("Snappings",
+                    aBeatmapSet.beatmaps.Select(beatmap =>
+                        RenderField(beatmap.metadataSettings.version,
+                            divisors.Select(divisor =>
+                                RenderClosedField($"1/{divisor} ({divisorStamps[beatmap][divisor].Count()})",
+                                    FormatTimestamps(
+                                        divisorStamps[beatmap][divisor].Count() > 0 ?
+                                            string.Join("<br>", divisorStamps[beatmap][divisor]) : "N/A"
+                                    )
+                                )
+                            ).ToArray()
+                        )
+                    ).ToArray()
+                );
         }
 
         private static string RenderMetadata(BeatmapSet aBeatmapSet)
@@ -755,6 +797,20 @@ namespace MapsetVerifierBackend.renderer
                         Encode(aTitle)
                     ),
                     Div("overview-field-content",
+                        aContents
+                    )
+                );
+        }
+
+        protected static string RenderClosedField(string aTitle, params string[] aContents)
+        {
+            return
+                Div("overview-field",
+                    Div("overview-field-title",
+                        Encode(aTitle)
+                    ),
+                    DivAttr("overview-field-content",
+                        "style=\"display: none;\"",
                         aContents
                     )
                 );
