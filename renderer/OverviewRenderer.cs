@@ -40,6 +40,13 @@ namespace MapsetVerifierBackend.renderer
         {
             var divisorStamps = new Dictionary<Beatmap, Dictionary<int, List<string>>>();
             List<int> divisors = new List<int>() { 1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 16 };
+            List<string> parts = new List<string>()
+            {
+                "Circle",
+                "Slider head", "Slider tail", "Slider reverse",
+                "Spinner head", "Spinner tail",
+                "Hold note head", "Hold note tail"
+            };
 
             foreach (Beatmap beatmap in aBeatmapSet.beatmaps)
             {
@@ -68,10 +75,16 @@ namespace MapsetVerifierBackend.renderer
                         RenderField(beatmap.metadataSettings.version,
                             divisors.Select(divisor =>
                                 RenderClosedField($"1/{divisor} ({divisorStamps[beatmap][divisor].Count()})",
-                                    FormatTimestamps(
-                                        divisorStamps[beatmap][divisor].Count() > 0 ?
-                                            string.Join("<br>", divisorStamps[beatmap][divisor]) : "N/A"
-                                    )
+                                    divisorStamps[beatmap][divisor].Count() > 0 ?
+                                        string.Join("", parts.Select(part =>
+                                            RenderField($"{part}s ({divisorStamps[beatmap][divisor].Where(stamp => stamp.Contains(part)).Count()})",
+                                                FormatTimestamps(
+                                                    divisorStamps[beatmap][divisor].Where(stamp => stamp.Contains(part)).Count() > 0 ?
+                                                        string.Join("<br>", divisorStamps[beatmap][divisor].Where(stamp => stamp.Contains(part))) : "N/A"
+                                                )
+                                            )
+                                        ).ToArray()) :
+                                        "N/A"
                                 )
                             ).ToArray()
                         )
