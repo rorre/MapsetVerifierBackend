@@ -213,7 +213,7 @@ namespace MapsetVerifierBackend.renderer
                                         i % (samplesPerBeat / 8) == 0 ?           "overview-timeline-ticks-yellow" :
                                         i % (samplesPerBeat / 12) == 0 ?          "overview-timeline-ticks-gray" :
                                         i % (samplesPerBeat / 16) == 0 ?          "overview-timeline-ticks-gray" :
-                                                                                  "overview-timeline-ticks-unsnapped") // these last ones shouldn't appear
+                                                                                  "overview-timeline-ticks-unsnapped")
                                     )
                                 ));
 
