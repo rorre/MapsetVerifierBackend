@@ -182,6 +182,7 @@ namespace MapsetVerifierBackend.renderer
 
                     // To get precision down to both 1/16th and 1/12th of a beat we need to sample...
                     // 16 = 2^4, 12 = 2^2*3, 2^4*3 = 48 times per beat.
+                    // We're going to intentionally ignore 1/5, 1/7, and 1/9, as we'd be sampling way too much.
                     int samplesPerBeat = 48;
                     for (int i = 0; i < (nextSwap - aLine.offset) / aLine.msPerBeat * samplesPerBeat; ++i)
                     {
