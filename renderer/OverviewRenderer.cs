@@ -29,9 +29,13 @@ namespace MapsetVerifierBackend.renderer
                     RenderStatistics(aBeatmapSet),
                     RenderResources(aBeatmapSet),
                     RenderColourSettings(aBeatmapSet),
+                    RenderStrainCharts(aBeatmapSet),
                     Div("overview-footer")
                 );
         }
+
+        private static string RenderStrainCharts(BeatmapSet aBeatmapSet) =>
+            ChartRenderer.RenderChart(aBeatmapSet);
 
         private static string RenderTimelineComparison(BeatmapSet aBeatmapSet) =>
             TimelineRenderer.Render(aBeatmapSet);
@@ -61,8 +65,8 @@ namespace MapsetVerifierBackend.renderer
                 {
                     foreach (double edgeTime in hitObject.GetEdgeTimes())
                     {
-                        int    divisor = beatmap.GetLowestDivisor(edgeTime);
-                        string stamp   = Timestamp.Get(edgeTime) + $"({hitObject.GetPartName(edgeTime)})";
+                        int divisor = beatmap.GetLowestDivisor(edgeTime);
+                        string stamp = Timestamp.Get(edgeTime) + $"({hitObject.GetPartName(edgeTime)})";
 
                         divisorStamps[beatmap][divisor].Add(stamp);
                     }
@@ -223,7 +227,7 @@ namespace MapsetVerifierBackend.renderer
                     RenderBeatmapContent(aBeatmapSet, "Skin Preference", aBeatmap =>
                         aBeatmap.generalSettings.skinPreference?.ToString())
 
-                    // Special N+1 Style is apparently not used by any mode, was meant for mania but was later overriden by user settings.
+                // Special N+1 Style is apparently not used by any mode, was meant for mania but was later overriden by user settings.
                 );
         }
 
@@ -446,12 +450,12 @@ namespace MapsetVerifierBackend.renderer
                             Div("overview-float",
                                 String.Join("<br>",
                                     hsUsedCount.Select(aPair =>
-                                        Try (() =>
-                                            {
-                                                string fullPath = Path.Combine(aBeatmapSet.songPath, aPair.Key);
+                                        Try(() =>
+                                           {
+                                               string fullPath = Path.Combine(aBeatmapSet.songPath, aPair.Key);
 
-                                                return Encode(RenderFileSize(fullPath));
-                                            },
+                                               return Encode(RenderFileSize(fullPath));
+                                           },
                                             noteIfError: "Could not get hit sound file size"
                                         )
                                     )
@@ -460,16 +464,16 @@ namespace MapsetVerifierBackend.renderer
                             Div("overview-float",
                                 String.Join("<br>",
                                     hsUsedCount.Select(aPair =>
-                                        Try (() =>
-                                            {
-                                                string fullPath = Path.Combine(aBeatmapSet.songPath, aPair.Key);
-                                                double duration = AudioBASS.GetDuration(fullPath);
+                                        Try(() =>
+                                           {
+                                               string fullPath = Path.Combine(aBeatmapSet.songPath, aPair.Key);
+                                               double duration = AudioBASS.GetDuration(fullPath);
 
-                                                if (duration < 0)
-                                                    return "0 ms";
+                                               if (duration < 0)
+                                                   return "0 ms";
 
-                                                return $"{duration:0.##} ms";
-                                            },
+                                               return $"{duration:0.##} ms";
+                                           },
                                             noteIfError: "Could not get hit sound duration"
                                         )
                                     )
@@ -478,12 +482,12 @@ namespace MapsetVerifierBackend.renderer
                             Div("overview-float",
                                 String.Join("<br>",
                                     hsUsedCount.Select(aPair =>
-                                        Try (() =>
-                                            {
-                                                string fullPath = Path.Combine(aBeatmapSet.songPath, aPair.Key);
+                                        Try(() =>
+                                           {
+                                               string fullPath = Path.Combine(aBeatmapSet.songPath, aPair.Key);
 
-                                                return Encode(AudioBASS.EnumToString(AudioBASS.GetFormat(fullPath)));
-                                            },
+                                               return Encode(AudioBASS.EnumToString(AudioBASS.GetFormat(fullPath)));
+                                           },
                                             noteIfError: "Could not get hit sound file path"
                                         )
                                     )
@@ -766,7 +770,7 @@ namespace MapsetVerifierBackend.renderer
                 }
             }
 
-            if(beatmapContent.Any(aPair => aPair.Value != beatmapContent.First().Value))
+            if (beatmapContent.Any(aPair => aPair.Value != beatmapContent.First().Value))
                 return
                     RenderField(aTitle,
                         String.Concat(

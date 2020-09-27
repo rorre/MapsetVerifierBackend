@@ -12,6 +12,18 @@ namespace MapsetVerifierBackend.renderer
 {
     public class Renderer
     {
+        /// <summary> Create a script injection with given content and attributes. </summary>
+        protected static string ScriptAttr(string anAttr, params object[] aContents)
+        {
+            return String.Concat("<script", anAttr, ">", String.Join("", aContents), "</script>");
+        }
+
+        /// <summary> Create a script injection content with given content. </summary>
+        protected static string Script(params object[] aContents)
+        {
+            return ScriptAttr("", aContents);
+        }
+
         /// <summary> Surrounds the content with a div tag using the given class(es), as well as any other attributes in the tag, like id or data. </summary>
         protected static string DivAttr(string aClass, string anAttr, params object[] aContents)
         {
@@ -123,9 +135,9 @@ namespace MapsetVerifierBackend.renderer
             return
                 aLevel == Issue.Level.Problem ? "cross" :
                 aLevel == Issue.Level.Warning ? "exclamation" :
-                aLevel == Issue.Level.Minor   ? "minor" :
-                aLevel == Issue.Level.Error   ? "error" :
-                aLevel == Issue.Level.Check   ? "check" :
+                aLevel == Issue.Level.Minor ? "minor" :
+                aLevel == Issue.Level.Error ? "error" :
+                aLevel == Issue.Level.Check ? "check" :
                                                 "info";
         }
 
