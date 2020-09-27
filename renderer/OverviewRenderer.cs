@@ -61,8 +61,11 @@ namespace MapsetVerifierBackend.renderer
                 {
                     foreach (double edgeTime in hitObject.GetEdgeTimes())
                     {
-                        int    divisor = beatmap.GetLowestDivisor(edgeTime);
-                        string stamp   = Timestamp.Get(edgeTime) + $"({hitObject.GetPartName(edgeTime)})";
+                        int divisor = beatmap.GetLowestDivisor(edgeTime);
+                        if (!divisors.Contains(divisor))
+                            continue;
+
+                        string stamp = Timestamp.Get(edgeTime) + $"({hitObject.GetPartName(edgeTime)})";
 
                         divisorStamps[beatmap][divisor].Add(stamp);
                     }
