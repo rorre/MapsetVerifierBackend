@@ -98,11 +98,13 @@ namespace MapsetVerifierBackend.renderer
             if (!(t.IsSubclassOf(typeof(Skill))))
                 throw new NotSupportedException("T must be a subclass of Skill.");
 
-            Object o = Activator.CreateInstance(t);
-            Skill skill = (Skill)o;
             List<DifficultySkillStrain> mapSkills = new List<DifficultySkillStrain>();
             foreach (Beatmap map in aBeatmapSet.beatmaps)
+            {
+                Object o = Activator.CreateInstance(t);
+                Skill skill = (Skill)o;
                 mapSkills.Add(StrainHelper.CalculateStrain(skill, map));
+            }
 
             var aimStrainChart = String.Concat(
                 RenderContainer(canvasName, RenderChartCanvas(canvasId)),
