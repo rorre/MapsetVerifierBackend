@@ -54,6 +54,10 @@ namespace MapsetVerifierBackend.helper
                 skill.Process(hitObject);
             }
 
+            // Add extra point so it doesn't end abruptly on chart
+            strainTime.Add(currentSectionEnd);
+            strainValue.Add(0);
+
             return new DifficultySkillStrain
             {
                 skillType = skill,
