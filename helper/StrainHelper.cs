@@ -10,6 +10,22 @@ namespace MapsetVerifierBackend.helper
     {
         private const int sectionLength = 400;
 
+        private static bool isInBreakTime(double time, Beatmap beatmap)
+        {
+            var breaks = beatmap.breaks;
+            foreach (var breakTime in breaks)
+            {
+                double startTime = breakTime.GetRealStart(beatmap);
+                double endTime = breakTime.GetRealEnd(beatmap);
+
+                if (startTime <= time && time <= endTime)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
         public static DifficultySkillStrain CalculateStrain(Skill skill, Beatmap beatmap)
         {
             List<double> strainTime = new List<double>();
@@ -26,10 +42,15 @@ namespace MapsetVerifierBackend.helper
 
                     // Add strains regardless of when they are to have consistent value over all difficulties
                     strainTime.Add(currentSectionEnd);
-                    strainValue.Add(skill.currentStrain);
+
+                    // Check whether is in break time or not, if yes then strain is 0.
+                    if (isInBreakTime(currentSectionEnd, beatmap))
+                        strainValue.Add(0);
+                    else
+                        strainValue.Add(skill.currentStrain);
+
                     currentSectionEnd += sectionLength;
                 }
-
                 skill.Process(hitObject);
             }
 
