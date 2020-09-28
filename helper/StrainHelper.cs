@@ -9,6 +9,7 @@ namespace MapsetVerifierBackend.helper
     public class StrainHelper
     {
         private const int sectionLength = 400;
+
         public static DifficultySkillStrain CalculateStrain(Skill skill, Beatmap beatmap)
         {
             List<double> strainTime = new List<double>();
