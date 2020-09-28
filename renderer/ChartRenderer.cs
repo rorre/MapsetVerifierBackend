@@ -113,12 +113,10 @@ namespace MapsetVerifierBackend.renderer
             return aimStrainChart;
         }
 
-        public static string RenderChart(BeatmapSet aBeatmapSet)
-        {
-            return String.Concat(
+        public static string RenderChart(BeatmapSet aBeatmapSet) =>
+            String.Concat(
                 RenderSkillChart(typeof(Aim), "AimStrain", "aimStrainCanvas", aBeatmapSet),
                 RenderSkillChart(typeof(Speed), "SpeedStrain", "speedStrainCanvas", aBeatmapSet)
             );
-        }
     }
 }
