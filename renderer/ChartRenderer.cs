@@ -17,6 +17,7 @@ namespace MapsetVerifierBackend.renderer
             public double x { get; set; }
             public double y { get; set; }
         }
+
         public struct Dataset
         {
             public string label { get; set; }
@@ -33,6 +34,7 @@ namespace MapsetVerifierBackend.renderer
             public List<string> labels { get; set; }
             public List<Dataset> datasets { get; set; }
         }
+
         private static Dataset GenerateChartData(DifficultySkillStrain diffStrain)
         {
             List<string> colors = new List<string> {
@@ -66,6 +68,7 @@ namespace MapsetVerifierBackend.renderer
             };
             return dataset;
         }
+
         private static string CreateChartScript(List<DifficultySkillStrain> diffStrains, string canvasId)
         {
             var datasets = new List<Dataset>();
@@ -82,29 +85,38 @@ namespace MapsetVerifierBackend.renderer
             string serealizedChart = JsonSerializer.Serialize(chart);
             return Script($"renderChart('{canvasId}', {serealizedChart})");
         }
+
         private static string RenderChartCanvas(string canvasId)
         {
             // Div is required for responsiveness
             // https://www.chartjs.org/docs/latest/general/responsive.html#important-note
             return Div("chart-container", $"<canvas id=\"{canvasId}\"></canvas>");
         }
-        public static string RenderChart(BeatmapSet aBeatmapSet)
+
+        public static string RenderSkillChart(Type t, string canvasName, string canvasId, BeatmapSet aBeatmapSet)
         {
+            if (!(t.IsSubclassOf(typeof(Skill))))
+                throw new NotSupportedException("T must be a subclass of Skill.");
+
+            Object o = Activator.CreateInstance(t);
+            Skill skill = (Skill)o;
             List<DifficultySkillStrain> mapSkills = new List<DifficultySkillStrain>();
-
-            Skill[] skills = {
-                new Aim(),
-            };
             foreach (Beatmap map in aBeatmapSet.beatmaps)
-                foreach (Skill skill in skills)
-                    mapSkills.Add(StrainHelper.CalculateStrain(skill, map));
+                mapSkills.Add(StrainHelper.CalculateStrain(skill, map));
 
-            var aimDiffs = mapSkills.Where(x => x.skillType == skills[0]).ToList();
             var aimStrainChart = String.Concat(
-                RenderContainer("AimStrain", RenderChartCanvas("aimStrainCanvas")),
-                CreateChartScript(aimDiffs, "aimStrainCanvas")
+                RenderContainer(canvasName, RenderChartCanvas(canvasId)),
+                CreateChartScript(mapSkills, canvasId)
             );
             return aimStrainChart;
+        }
+
+        public static string RenderChart(BeatmapSet aBeatmapSet)
+        {
+            return String.Concat(
+                RenderSkillChart(typeof(Aim), "AimStrain", "aimStrainCanvas", aBeatmapSet),
+                RenderSkillChart(typeof(Speed), "SpeedStrain", "speedStrainCanvas", aBeatmapSet)
+            );
         }
     }
 }
